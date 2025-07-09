@@ -55,9 +55,9 @@ public class ProductController {
     }
 
     @PostMapping("/cart/add/{id}")
-    public String addToCart(@PathVariable Long id) {
+    public String addToCart(@PathVariable Long id, @RequestParam int quantity) {
         Product product = productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        cartService.addCartItem(product);
+        cartService.addCartItem(product, quantity);
         return "redirect:/cart";
     }
 
