@@ -1,0 +1,13 @@
+insert into product(name, description, price, is_available) values ('First', '12344', 1000, true);
+insert into product(name, description, price, is_available) values ('Second', '2345', 999, true);
+insert into product(name, description, price, is_available) values ('Third', '34567', 51, true);
+insert into product(name, description, price, is_available) values ('Fourth', '45678', 441, true);
+insert into product(name, description, price, is_available) values ('Fifth', '5678', 2344, true);
+insert into product(name, description, price, is_available) values ('Sixes', 'qwer', 9999, true);
+insert into product(name, description, price, is_available) values ('Sevens', 'wert', 522, true);
+insert into product(name, description, price, is_available) values ('Eights', 'erty', 123.1, true);
+insert into product(name, description, price, is_available) values ('Nines', 'rtyu', 4412.2, true);
+insert into product(name, description, price, is_available) values ('Tens', 'tyui', 555, true);
+insert into product(name, description, price, is_available) values ('Elevens', 'asdf', 888, false);
+insert into product(name, description, price, is_available) values ('Twelves', 'sdfg', 0.23, true);
+insert into product(name, description, price, is_available) values ('Thirteens', 'zxcv', 2354, true);

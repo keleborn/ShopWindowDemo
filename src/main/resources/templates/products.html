@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Товары</title>
+</head>
+<body>
+<h1>Витрина товаров</h1>
+<p th:text="'Всего товаров: ' + ${productPage.numberOfElements}"></p>
+<form th:action="@{/products}" method="get">
+    <input type="text" name="search" placeholder="Поиск" th:value="${search}">
+    <select name="size">
+        <option value="5" th:selected="${param.size == 5}">5</option>
+        <option value="10" th:selected="${param.size == 10}">10</option>
+        <option value="20" th:selected="${param.size == 20}">20</option>
+    </select>
+    <button type="submit">Искать</button>
+</form>
+
+<form th:action="@{/products}" method="get">
+    <input type="hidden" name="search" th:value="${search}">
+    <input type="hidden" name="page" th:value="${currentPage}">
+    <input type="hidden" name="size" th:value="${pageSize}">
+    <label for="sort">Сортировать по цене</label>
+    <select name="sort" onchange="this.form.submit()">
+        <option value="desc" th:selected="${sort == 'price_desc'}">По убыванию цены</option>
+        <option value="asc" th:selected="${sort == 'price_asc'}">По возрастанию цены</option>
+        <option value="name_asc" th:selected="${sort == 'name_asc'}">По названию A->Z</option>
+        <option value="name_desc" th:selected="${sort == 'name_desc'}">По названию Z->A</option>
+    </select>
+</form>
+
+<div th:each="product : ${productPage.content}">
+    <div>
+        <p><strong>Название:</strong> <span th:text="${product.name}"></span></p>
+        <p><strong>Описание:</strong> <span th:text="${product.description}"></span></p>
+        <p><strong>Цена:</strong> <span th:text="${product.price}"></span>у.е</p>
+    </div>
+    <hr>
+</div>
+
+<div>
+    <span th:if="${productPage.hasPrevious()}">
+        <a th:href="@{/products(page=${currentPage-1}, size=${pageSize}, search=${search}, sort=${sort})}">Назад</a>
+    </span>
+    <span th:text="${currentPage + 1}">1</span>
+    <span th:text="${productPage.totalPages}">1</span>
+    <span th:if="${productPage.hasNext()}">
+        <a th:href="@{/products(page = ${currentPage + 1}, size=${pageSize}, search=${search}, sort=${sort})}">Вперед</a>
+    </span>
+</div>
+</body>
+</html>
