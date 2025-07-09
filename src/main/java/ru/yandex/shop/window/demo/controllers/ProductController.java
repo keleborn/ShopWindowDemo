@@ -3,23 +3,25 @@ package ru.yandex.shop.window.demo.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.shop.window.demo.enums.SortType;
 import ru.yandex.shop.window.demo.model.Product;
 import ru.yandex.shop.window.demo.repository.ProductRepository;
+import ru.yandex.shop.window.demo.services.CartService;
 
 @Controller
 @RequestMapping("/products")
 public class ProductController {
     private final ProductRepository productRepository;
+    private final CartService cartService;
 
-    public ProductController(final ProductRepository productRepository) {
+    public ProductController(ProductRepository productRepository, CartService cartService) {
         this.productRepository = productRepository;
+        this.cartService = cartService;
     }
 
     @GetMapping
@@ -43,5 +45,33 @@ public class ProductController {
         model.addAttribute("search", search);
         model.addAttribute("sort", sort);
         return "products";
+    }
+
+    @GetMapping("/{id}")
+    public String getProduct(@PathVariable long id, Model model) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        model.addAttribute("product", product);
+        return "product";
+    }
+
+    @PostMapping("/cart/add/{id}")
+    public String addToCart(@PathVariable Long id) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        cartService.addCartItem(product);
+        return "redirect:/cart";
+    }
+
+    @PostMapping("/cart/remove/{id}")
+    public String removeFromCart(@PathVariable Long id) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        cartService.removeCartItem(product);
+        return "redirect:/cart";
+    }
+
+    @GetMapping("/cart")
+    public String showCart(Model model) {
+        model.addAttribute("items", cartService.getCartItems());
+        model.addAttribute("total", cartService.getTotal());
+        return "cart";
     }
 }

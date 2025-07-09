@@ -32,7 +32,7 @@
 
 <div th:each="product : ${productPage.content}">
     <div>
-        <p><strong>Название:</strong> <span th:text="${product.name}"></span></p>
+        <a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.name}"></a>
         <p><strong>Описание:</strong> <span th:text="${product.description}"></span></p>
         <p><strong>Цена:</strong> <span th:text="${product.price}"></span>у.е</p>
     </div>

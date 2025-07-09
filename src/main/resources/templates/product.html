@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${product.name}">Просмотр продукта</title>
+</head>
+<body>
+<div>
+    <p><strong>Название:</strong> <span th:text="${product.name}"></span></p>
+    <p><strong>Описание:</strong> <span th:text="${product.description}"></span></p>
+    <p><strong>Цена:</strong> <span th:text="${product.price}"></span>у.е</p>
+    <p><strong>Доступность:</strong> <span th:text="${product.isAvailable ? 'В наличии' : 'Нет в наличии'}"</p>
+</div>
+<hr>
+<a th:href="@{/products}">Назад к витрине</a>
+</body>
+</html>
