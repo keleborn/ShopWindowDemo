@@ -19,7 +19,7 @@ public enum SortType {
     public static SortType from(String key) {
         if (key == null || key.isBlank()) return UNSORTED;
         for (SortType sortType : SortType.values()) {
-            if (sortType.key.equals(key)) {
+            if (key.equals(sortType.key)) {
                 return sortType;
             }
         }

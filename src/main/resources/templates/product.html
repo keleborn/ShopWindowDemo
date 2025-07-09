@@ -10,6 +10,9 @@
     <p><strong>Описание:</strong> <span th:text="${product.description}"></span></p>
     <p><strong>Цена:</strong> <span th:text="${product.price}"></span>у.е</p>
     <p><strong>Доступность:</strong> <span th:text="${product.isAvailable ? 'В наличии' : 'Нет в наличии'}"</p>
+    <form th:action="@{/products/cart/add/{id}(id=${product.id})}" method="post">
+        <button type="submit">Добавить в корзину</button>
+    </form>
 </div>
 <hr>
 <a th:href="@{/products}">Назад к витрине</a>

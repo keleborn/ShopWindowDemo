@@ -67,11 +67,4 @@ public class ProductController {
         cartService.removeCartItem(product);
         return "redirect:/cart";
     }
-
-    @GetMapping("/cart")
-    public String showCart(Model model) {
-        model.addAttribute("items", cartService.getCartItems());
-        model.addAttribute("total", cartService.getTotal());
-        return "cart";
-    }
 }

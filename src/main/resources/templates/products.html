@@ -23,8 +23,8 @@
     <input type="hidden" name="size" th:value="${pageSize}">
     <label for="sort">Сортировать по цене</label>
     <select name="sort" onchange="this.form.submit()">
-        <option value="desc" th:selected="${sort == 'price_desc'}">По убыванию цены</option>
-        <option value="asc" th:selected="${sort == 'price_asc'}">По возрастанию цены</option>
+        <option value="price_desc" th:selected="${sort == 'price_desc'}">По убыванию цены</option>
+        <option value="price_asc" th:selected="${sort == 'price_asc'}">По возрастанию цены</option>
         <option value="name_asc" th:selected="${sort == 'name_asc'}">По названию A->Z</option>
         <option value="name_desc" th:selected="${sort == 'name_desc'}">По названию Z->A</option>
     </select>
