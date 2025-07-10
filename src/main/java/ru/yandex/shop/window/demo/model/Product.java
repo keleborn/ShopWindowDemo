@@ -33,4 +33,11 @@ public class Product {
 
     @Column(name = "is_available")
     private boolean isAvailable = true;
+
+    public Product(String name, String description, BigDecimal price, boolean isAvailable) {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.isAvailable = isAvailable;
+    }
 }
