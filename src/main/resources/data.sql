@@ -1,8 +1,8 @@
 insert into product(name, description, price, is_available) values ('First', '12344', 1000, true);
 insert into product(name, description, price, is_available) values ('Second', '2345', 999, true);
-insert into product(name, description, price, is_available) values ('Third', '34567', 51, true);
+insert into product(name, description, price, is_available, image_url) values ('Third', '34567', 51, true, '/images/first.png');
 insert into product(name, description, price, is_available) values ('Fourth', '45678', 441, true);
-insert into product(name, description, price, is_available) values ('Fifth', '5678', 2344, true);
+insert into product(name, description, price, is_available, image_url) values ('Fifth', '5678', 2344, true, '/images/second.png');
 insert into product(name, description, price, is_available) values ('Sixes', 'qwer', 9999, true);
 insert into product(name, description, price, is_available) values ('Sevens', 'wert', 522, true);
 insert into product(name, description, price, is_available) values ('Eights', 'erty', 123.1, true);

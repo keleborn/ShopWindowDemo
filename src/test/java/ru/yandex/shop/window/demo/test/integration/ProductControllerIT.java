@@ -38,6 +38,7 @@ public class ProductControllerIT {
     @BeforeEach
     void setUp() {
         repo.deleteAll();
+        cartService.clearCart();
         repo.save(new Product("Test", "Description", BigDecimal.valueOf(100), true));
     }
 

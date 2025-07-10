@@ -22,6 +22,18 @@
     </select>
     <button type="submit">Искать</button>
 </form>
+<form th:action="@{/products}" method="get">
+    <label>
+        Фильтр по алфавиту: <input type="text" name="alphabetFilter" placeholder="Фильтр по алфавиту" th:value="${alphabetFilter}">
+    </label>
+    <label>
+        Цена от: <input type="number" name="minPrice" step="0.01" min="0" th:value="${minPrice}">
+    </label>
+    <label>
+        до: <input type="number" name="maxPrice" step="0.01" min="0" th:value="${maxPrice}">
+    </label>
+    <button type="submit">Применить</button>
+</form>
 
 <form th:action="@{/products}" method="get">
     <input type="hidden" name="search" th:value="${search}">
@@ -39,6 +51,9 @@
 <div th:each="product : ${productPage.content}">
     <div>
         <a th:href="@{/products/{id}(id=${product.id})}" th:text="${product.name}"></a>
+        <div th:if="${product.imageUrl != null}">
+            <img th:src="@{${product.imageUrl}}" width="200"/>
+        </div>
         <p><strong>Описание:</strong> <span th:text="${product.description}"></span></p>
         <p><strong>Цена:</strong> <span th:text="${product.price}"></span>у.е</p>
     </div>

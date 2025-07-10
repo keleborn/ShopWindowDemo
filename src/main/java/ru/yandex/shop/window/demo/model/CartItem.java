@@ -18,6 +18,7 @@ public class CartItem {
         OrderItem orderItem = new OrderItem();
         orderItem.setProductName(product.getName());
         orderItem.setPrice(product.getPrice());
+        orderItem.setImageUrl(product.getImageUrl());
         orderItem.setQuantity(quantity);
         return orderItem;
     }

@@ -3,6 +3,7 @@ package ru.yandex.shop.window.demo.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,9 @@ import ru.yandex.shop.window.demo.enums.SortType;
 import ru.yandex.shop.window.demo.model.Product;
 import ru.yandex.shop.window.demo.repository.ProductRepository;
 import ru.yandex.shop.window.demo.services.CartService;
+import ru.yandex.shop.window.demo.specification.ProductSpecification;
+
+import java.math.BigDecimal;
 
 @Controller
 @RequestMapping("/products")
@@ -29,21 +33,30 @@ public class ProductController {
                               @RequestParam(defaultValue = "0") int page,
                               @RequestParam(defaultValue = "10") int size,
                               @RequestParam(required = false) String sort,
-                              @RequestParam(required = false) String search
+                              @RequestParam(required = false) String search,
+                              @RequestParam(required = false) BigDecimal minPrice,
+                              @RequestParam(required = false) BigDecimal maxPrice,
+                              @RequestParam(required = false) String alphabetFilter
                               ) {
         SortType sortType = SortType.from(sort);
         Pageable pageable = PageRequest.of(page, size, sortType.getSort());
-        Page<Product> productPage;
-        if (search != null && !search.isBlank()) {
-            productPage = productRepository.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(search, search, pageable);
-        } else {
-            productPage = productRepository.findByIsAvailableTrue(pageable);
-        }
+
+        Specification<Product> specification = Specification.allOf(ProductSpecification.priceGreaterOrEqual(minPrice))
+                .and(ProductSpecification.priceLessOrEqual(maxPrice))
+                .and(ProductSpecification.nameStartsWith(alphabetFilter))
+                .and(ProductSpecification.nameOrDescriptionConatins(search))
+                .and(ProductSpecification.isAvailable());
+
+        Page<Product> productPage = productRepository.findAll(specification, pageable);
+
         model.addAttribute("productPage", productPage);
         model.addAttribute("currentPage", page);
         model.addAttribute("pageSize", size);
         model.addAttribute("search", search);
         model.addAttribute("sort", sort);
+        model.addAttribute("alphabetFilter", alphabetFilter);
+        model.addAttribute("maxPrice", maxPrice);
+        model.addAttribute("minPrice", minPrice);
         return "products";
     }
 

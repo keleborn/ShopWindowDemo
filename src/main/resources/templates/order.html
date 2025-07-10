@@ -21,6 +21,7 @@
 <table>
     <thead>
     <tr>
+        <th>Картинка</th>
         <th>Название</th>
         <th>Цена</th>
         <th>Количество</th>
@@ -28,6 +29,14 @@
     </thead>
     <tbody>
     <tr th:each="item : ${order.orderItems}">
+        <td>
+            <div th:if="${item.imageUrl != null}">
+                <img th:src="@{${item.imageUrl}}" width="200"/>
+            </div>
+            <div th:if="${item.imageUrl == null}">
+                <em>Нема картинки</em>
+            </div>
+        </td>
         <td th:text="${item.productName}"></td>
         <td th:text="${item.price}"> шт.</td>
         <td th:text="${item.quantity}"> у.е.</td>

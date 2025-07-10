@@ -15,7 +15,10 @@
     <p><strong>Название:</strong> <span th:text="${product.name}"></span></p>
     <p><strong>Описание:</strong> <span th:text="${product.description}"></span></p>
     <p><strong>Цена:</strong> <span th:text="${product.price}"></span>у.е</p>
-    <p><strong>Доступность:</strong> <span th:text="${product.isAvailable ? 'В наличии' : 'Нет в наличии'}"</p>
+    <p><strong>Доступность:</strong> <span th:text="${product.isAvailable ? 'В наличии' : 'Нет в наличии'}"></span></p>
+    <div th:if="${product.imageUrl != null}">
+        <img th:src="@{${product.imageUrl}}" width="200"/>
+    </div>
     <form th:action="@{/products/cart/add/{id}(id=${product.id})}" method="post">
         <label for="qty">Количество:></label>
         <input type="number" id="qty" name="quantity" min="1" step="1" required>

@@ -40,21 +40,6 @@ public class ProductRepositoryIT {
     }
 
     @Test
-    void findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase_shouldFindProducts() {
-        repo.save(new Product("test2", "test_description2", BigDecimal.valueOf(100), true));
-
-        assertThat(repo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase("test", "test", pageable)).hasSize(2);
-        assertThat(repo.findByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase("test2", "test2", pageable)).hasSize(1);
-    }
-
-    @Test
-    void findByIsAvailableTrue_shouldFindAvailableProducts() {
-        repo.save(new Product("test2", "description2", BigDecimal.valueOf(100), false));
-
-        assertThat(repo.findByIsAvailableTrue(pageable)).hasSize(1);
-    }
-
-    @Test
     void findByName_shouldFindProductByName() {
         repo.save(new Product("test2", "description2", BigDecimal.valueOf(100), true));
 
