@@ -15,7 +15,6 @@ import ru.yandex.shop.window.demo.services.CartService;
 
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;

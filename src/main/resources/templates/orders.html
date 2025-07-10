@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Заказы</title>
+</head>
+<body>
+<h2>Заказы</h2>
+<div style="text-align: right;">
+    <a th:href="@{/cart}">Корзина</a>
+</div>
+<div style="text-align: right;">
+    <a th:href="@{/orders}">Заказы</a>
+</div>
+<div th:if="${#lists.isEmpty(orders)}">
+    <p>Пусто.</p>
+</div>
+<ul>
+    <li th:each="order : ${orders}">
+        <a th:href="@{'/orders/' + ${order.id}}">
+            Заказ <span th:text="${order.id}"></span>
+        </a>
+    </li>
+</ul>
+<hr>
+<a th:href="@{/products}">Назад к витрине</a>
+</body>
+</html>

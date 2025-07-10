@@ -2,18 +2,24 @@ package ru.yandex.shop.window.demo.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.shop.window.demo.model.CartItem;
+import ru.yandex.shop.window.demo.model.Order;
+import ru.yandex.shop.window.demo.model.OrderItem;
+import ru.yandex.shop.window.demo.repository.OrderRepository;
 import ru.yandex.shop.window.demo.services.CartService;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Controller
 public class CartController {
     private final CartService cartService;
+    private final OrderRepository orderRepository;
 
-    public CartController(final CartService cartService) {
+    public CartController(CartService cartService, OrderRepository orderRepository) {
         this.cartService = cartService;
+        this.orderRepository = orderRepository;
     }
 
     @GetMapping("/cart")
@@ -28,5 +34,24 @@ public class CartController {
     public String updateCart(@PathVariable Long id, @RequestParam int quantity, Model model) {
         cartService.setQuantity(id, quantity);
         return "redirect:/cart";
+    }
+
+    @GetMapping("/cart/checkout")
+    public String checkout(Model model) {
+        model.addAttribute("order", new Order());
+        return "checkout";
+    }
+
+    @PostMapping("/cart/checkout")
+    public String processCheckout(@ModelAttribute("order") Order order) {
+        List<OrderItem> orderItems = cartService.getCartItems().stream()
+                .map(CartItem::toOrderItem).toList();
+        
+        order.setOrderItems(orderItems);
+        order.setCreatedAt(LocalDateTime.now());
+        
+        orderRepository.save(order);
+        cartService.clearCart();
+        return "redirect:/orders";
     }
 }

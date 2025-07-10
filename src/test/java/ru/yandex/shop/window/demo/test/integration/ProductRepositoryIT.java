@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @ActiveProfiles("test")
 @Transactional
-public class ProductRepositpryIT {
+public class ProductRepositoryIT {
 
     private final Pageable pageable = PageRequest.of(0, 10, Sort.unsorted());
 

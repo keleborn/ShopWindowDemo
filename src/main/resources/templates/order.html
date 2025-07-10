@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${order.id}">Заказ</title>
+</head>
+<body>
+<div style="text-align: right;">
+    <a th:href="@{/cart}">Корзина</a>
+</div>
+<div style="text-align: right;">
+    <a th:href="@{/orders}">Заказы</a>
+</div>
+<p>
+    <strong>Дата заказа: </strong>
+    <span th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
+    <br/>
+    <strong>Имя: </strong>
+    <span th:text="${order.customerName}"></span>
+</p>
+<table>
+    <thead>
+    <tr>
+        <th>Название</th>
+        <th>Цена</th>
+        <th>Количество</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${order.orderItems}">
+        <td th:text="${item.productName}"></td>
+        <td th:text="${item.price}"> шт.</td>
+        <td th:text="${item.quantity}"> у.е.</td>
+    </tr>
+    </tbody>
+</table>
+<hr>
+<a th:href="@{/products}">Назад к витрине</a>
+</body>
+</html>

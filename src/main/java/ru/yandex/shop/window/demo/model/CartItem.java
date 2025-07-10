@@ -13,4 +13,12 @@ public class CartItem {
         this.product = product;
         this.quantity = quantity;
     }
+
+    public OrderItem toOrderItem() {
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProductName(product.getName());
+        orderItem.setPrice(product.getPrice());
+        orderItem.setQuantity(quantity);
+        return orderItem;
+    }
 }

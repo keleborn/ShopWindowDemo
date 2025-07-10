@@ -5,6 +5,12 @@
     <title>Товары</title>
 </head>
 <body>
+<div style="text-align: right;">
+    <a th:href="@{/cart}">Корзина</a>
+</div>
+<div style="text-align: right;">
+    <a th:href="@{/orders}">Заказы</a>
+</div>
 <h1>Витрина товаров</h1>
 <p th:text="'Всего товаров: ' + ${productPage.numberOfElements}"></p>
 <form th:action="@{/products}" method="get">

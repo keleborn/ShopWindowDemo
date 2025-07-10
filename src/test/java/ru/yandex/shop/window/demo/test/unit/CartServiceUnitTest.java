@@ -69,4 +69,12 @@ public class CartServiceUnitTest {
 
         assertEquals(BigDecimal.valueOf(quantity).multiply(product.getPrice()), cartService.getTotal());
     }
+
+    @Test
+    void clearCart_shouldClearCart() {
+        cartService.addCartItem(product, quantity);
+
+        cartService.clearCart();
+        assertEquals(0, cartService.getCartItems().size());
+    }
 }

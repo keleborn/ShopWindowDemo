@@ -6,6 +6,12 @@
 </head>
 <body>
 <h1>Корзина</h1>
+<div style="text-align: right;">
+    <a th:href="@{/cart}">Корзина</a>
+</div>
+<div style="text-align: right;">
+    <a th:href="@{/orders}">Заказы</a>
+</div>
 <div th:if="${#lists.isEmpty(items)}">
     <p>Пусто.</p>
 </div>
@@ -34,6 +40,9 @@
         </tr>
     </table>
     <p><strong>К оплате:</strong> <span th:text="${total}">0</span>у.е.</p>
+    <a th:href="@{/cart/checkout}">
+        <button>Оформить заказ</button>
+    </a>
 </div>
 <hr>
 <a th:href="@{/products}">Назад к витрине</a>
