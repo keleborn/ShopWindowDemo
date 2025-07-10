@@ -31,7 +31,7 @@ public class CartController {
 
 
     @PostMapping("/cart/update/{id}")
-    public String updateCart(@PathVariable Long id, @RequestParam int quantity, Model model) {
+    public String updateCart(@PathVariable Long id, @RequestParam int quantity) {
         cartService.setQuantity(id, quantity);
         return "redirect:/cart";
     }
