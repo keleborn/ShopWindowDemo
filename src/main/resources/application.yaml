@@ -19,6 +19,14 @@ spring:
   sql:
     init:
       mode: always
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 5MB
+      max-request-size: 5MB
+  web:
+    resources:
+      static-locations: file:uploads/
 logging:
   level:
     org.springframework.jdbc.datasource.init.ScriptUtils: DEBUG

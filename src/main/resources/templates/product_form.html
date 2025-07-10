@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Добавить продукт</title>
+</head>
+<body>
+<h1>Добавить продукт</h1>
+<div style="text-align: right;">
+    <a th:href="@{/cart}">Корзина</a>
+</div>
+<div style="text-align: right;">
+    <a th:href="@{/orders}">Заказы</a>
+</div>
+
+<form th:action="@{/products}" th:object="${product}" method="post" enctype="multipart/form-data">
+    <label>
+        Название: <input type="text" th:field="*{name}" required>
+    </label>
+    <br/>
+    <label>
+        Описание: <input type="text" th:field="*{description}" required>
+    </label>
+    <br/>
+    <label>
+        Цена: <input type="number" th:field="*{price}" required>
+    </label>
+    <br/>
+    <label>
+        Картинка: <input type="file" name="imageFile" accept="image/*">
+    </label>
+    <br/>
+    <label>
+        Доступность: <input type="checkbox" th:field="*{available}" required>
+    </label>
+    <br/>
+    <button type="submit">Сохранить</button>
+</form>
+
+<hr>
+<a th:href="@{/products}">Назад к витрине</a>
+</body>
+</html>

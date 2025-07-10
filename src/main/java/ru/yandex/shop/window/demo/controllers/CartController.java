@@ -50,8 +50,8 @@ public class CartController {
         order.setOrderItems(orderItems);
         order.setCreatedAt(LocalDateTime.now());
         
-        orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
         cartService.clearCart();
-        return "redirect:/orders";
+        return "redirect:/orders/" + savedOrder.getId();
     }
 }

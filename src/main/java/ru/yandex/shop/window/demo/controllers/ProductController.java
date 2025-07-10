@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import ru.yandex.shop.window.demo.enums.SortType;
 import ru.yandex.shop.window.demo.model.Product;
@@ -15,7 +16,12 @@ import ru.yandex.shop.window.demo.repository.ProductRepository;
 import ru.yandex.shop.window.demo.services.CartService;
 import ru.yandex.shop.window.demo.specification.ProductSpecification;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
 @Controller
 @RequestMapping("/products")
@@ -79,5 +85,27 @@ public class ProductController {
         Product product = productRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         cartService.removeCartItem(product);
         return "redirect:/cart";
+    }
+
+    @GetMapping("/new")
+    public String showCreateForm(Model model) {
+        model.addAttribute("product", new Product());
+        return "product_form";
+    }
+
+    @PostMapping
+    public String processCreateForm(@ModelAttribute Product product, @RequestParam(value = "imageFile", required = false) MultipartFile imageFile) throws IOException {
+        if (imageFile != null && !imageFile.isEmpty()) {
+            String fileName = UUID.randomUUID() + imageFile.getOriginalFilename();
+            String uploadDir = System.getProperty("user.dir");
+            Path imagePath = Paths.get(uploadDir + "/uploads/images", fileName);
+
+            Files.createDirectories(imagePath.getParent());
+            imageFile.transferTo(imagePath.toFile());
+            product.setImageUrl("/images/" + fileName);
+        }
+
+        productRepository.save(product);
+        return "redirect:/products";
     }
 }

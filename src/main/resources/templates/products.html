@@ -35,6 +35,9 @@
     <button type="submit">Применить</button>
 </form>
 
+<hr>
+<a th:href="@{/products/new}" class="add-button">Добавить продукт</a>
+<hr>
 <form th:action="@{/products}" method="get">
     <input type="hidden" name="search" th:value="${search}">
     <input type="hidden" name="page" th:value="${currentPage}">

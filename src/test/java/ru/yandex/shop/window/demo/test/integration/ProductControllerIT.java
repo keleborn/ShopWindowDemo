@@ -18,8 +18,7 @@ import java.util.Collection;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -81,5 +80,23 @@ public class ProductControllerIT {
 
         Collection<CartItem> items = cartService.getCartItems();
         assertThat(items).hasSize(0);
+    }
+
+    @Test
+    void showCreateForm_shouldShowCreateForm() throws Exception {
+        mvc.perform(get("/products/new"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("product"))
+                .andExpect(view().name("product_form"));
+    }
+
+    @Test
+    void processCreateForm_shouldSaveProduct() throws Exception {
+        mvc.perform(multipart("/products")
+                        .param("name", "Test")
+                        .param("description", "Description")
+                        .param("price", "100"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/products"));
     }
 }
