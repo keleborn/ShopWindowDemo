@@ -6,12 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import ru.yandex.shop.window.demo.enums.SortType;
@@ -108,17 +103,18 @@ public class ProductController {
     }
 
     @PostMapping
-    public Mono<String> processCreateForm(@ModelAttribute Product product, @RequestParam(value = "imageFile", required = false) FilePart imageFile) throws IOException {
+    public Mono<String> processCreateForm(@ModelAttribute Product product, @RequestPart(value = "imageFile", required = false) FilePart imageFile) throws IOException {
+        Mono<Void> fileTransfer = Mono.empty();
         if (imageFile != null && !imageFile.filename().isBlank()) {
             String fileName = UUID.randomUUID() + imageFile.filename();
             String uploadDir = System.getProperty("user.dir");
             Path imagePath = Paths.get(uploadDir + "/uploads/images", fileName);
 
-            imageFile.transferTo(imagePath)
+            fileTransfer = imageFile.transferTo(imagePath)
                     .doOnSuccess(unused -> product.setImageUrl("/images/" + fileName));
         }
 
-        return productRepository.save(product)
+        return fileTransfer.then(productRepository.save(product))
                 .thenReturn("redirect:/products");
     }
 }

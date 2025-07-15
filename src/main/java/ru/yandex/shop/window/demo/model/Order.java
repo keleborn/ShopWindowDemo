@@ -20,4 +20,9 @@ public class Order {
 
     private String customerName;
     private LocalDateTime createdAt;
+
+    public Order(String customerName, LocalDateTime createdAt) {
+        this.customerName = customerName;
+        this.createdAt = createdAt;
+    }
 }

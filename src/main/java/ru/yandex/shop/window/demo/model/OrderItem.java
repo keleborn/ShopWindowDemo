@@ -23,4 +23,12 @@ public class OrderItem {
     private BigDecimal price;
     private int quantity;
     private String imageUrl;
+
+    public OrderItem(Long orderId, String productName, BigDecimal price, int quantity, String imageUrl) {
+        this.orderId = orderId;
+        this.productName = productName;
+        this.price = price;
+        this.quantity = quantity;
+        this.imageUrl = imageUrl;
+    }
 }
