@@ -1,6 +1,5 @@
 package ru.yandex.shop.window.demo.controllers;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -9,9 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
-import ru.yandex.shop.window.demo.model.Order;
-import ru.yandex.shop.window.demo.repository.OrderItemRepository;
-import ru.yandex.shop.window.demo.repository.OrderRepository;
 import ru.yandex.shop.window.demo.services.OrderService;
 
 @Controller
