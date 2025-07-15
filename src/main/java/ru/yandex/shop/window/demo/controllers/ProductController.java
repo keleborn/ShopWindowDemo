@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import ru.yandex.shop.window.demo.enums.SortType;
+import ru.yandex.shop.window.demo.model.CartForm;
 import ru.yandex.shop.window.demo.model.PagedResult;
 import ru.yandex.shop.window.demo.model.Product;
 import ru.yandex.shop.window.demo.repository.ProductRepository;
@@ -84,11 +85,11 @@ public class ProductController {
                 });
     }
 
-    @PostMapping("/cart/add/{id}")
-    public Mono<String> addToCart(@PathVariable Long id, @RequestParam int quantity) {
+    @PostMapping(value = "/cart/add/{id}")
+    public Mono<String> addToCart(@PathVariable Long id, CartForm form) {
         return productRepository.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                .doOnNext(product -> cartService.addCartItem(product, quantity))
+                .doOnNext(product -> cartService.addCartItem(product, form.getQuantity()))
                 .thenReturn("redirect:/cart");
     }
 

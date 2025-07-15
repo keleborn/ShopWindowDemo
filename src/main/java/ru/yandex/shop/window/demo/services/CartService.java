@@ -14,13 +14,13 @@ public class CartService {
     private final Map<Long, CartItem> cart = new HashMap<Long, CartItem>();
 
     public void addCartItem(Product product, int quantity) {
-//        cart.compute(product.getId(), (id, item) -> {
-//            if (item == null) {
-//                return new CartItem(product, quantity);
-//            }
-//            item.setQuantity(item.getQuantity() + quantity);
-//            return item;
-//        });
+        cart.compute(product.getId(), (id, item) -> {
+            if (item == null) {
+                return new CartItem(product, quantity);
+            }
+            item.setQuantity(item.getQuantity() + quantity);
+            return item;
+        });
     }
 
     public void removeCartItem(Product product) {
@@ -32,9 +32,9 @@ public class CartService {
     }
 
     public BigDecimal getTotal() {
-        return BigDecimal.ZERO;//.values().stream()
-//                .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
-//                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return cart.values().stream()
+                .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public void clearCart() {
@@ -42,13 +42,13 @@ public class CartService {
     }
 
     public void setQuantity(Long id, int quantity) {
-//        if (quantity <= 0) {
-//            cart.remove(id);
-//        } else {
-//            cart.computeIfPresent(id, (productId, item) -> {
-//                item.setQuantity(quantity);
-//                return item;
-//            });
-//        }
+        if (quantity <= 0) {
+            cart.remove(id);
+        } else {
+            cart.computeIfPresent(id, (productId, item) -> {
+                item.setQuantity(quantity);
+                return item;
+            });
+        }
     }
 }

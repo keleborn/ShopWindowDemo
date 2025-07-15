@@ -9,11 +9,11 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
 
+@Table("products")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table("products")
 public class Product {
     @Id
     private Long id;

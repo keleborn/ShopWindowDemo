@@ -45,8 +45,6 @@ public class CustomProductRepositoryImpl implements CustomProductRepository {
         if (sort.isSorted()) {
             Sort.Order order = sort.iterator().next();
             sql.append(" order by ").append(order.getProperty()).append(" ").append(order.getDirection().name());
-        } else {
-            sql.append(" order by id ");
         }
         sql.append(" limit ")
                 .append(pageable.getPageSize())
