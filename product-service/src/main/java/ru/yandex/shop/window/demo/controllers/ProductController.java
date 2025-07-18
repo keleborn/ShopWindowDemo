@@ -13,8 +13,8 @@ import ru.yandex.shop.window.demo.enums.SortType;
 import ru.yandex.shop.window.demo.model.CartForm;
 import ru.yandex.shop.window.demo.model.PagedResult;
 import ru.yandex.shop.window.demo.model.Product;
-import ru.yandex.shop.window.demo.repository.ProductRepository;
 import ru.yandex.shop.window.demo.services.CartService;
+import ru.yandex.shop.window.demo.services.ProductService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -25,12 +25,12 @@ import java.util.UUID;
 @Controller
 @RequestMapping("/products")
 public class ProductController {
-    private final ProductRepository productRepository;
+    private final ProductService productService;
     private final CartService cartService;
 
-    public ProductController(ProductRepository productRepository, CartService cartService) {
-        this.productRepository = productRepository;
+    public ProductController(CartService cartService, ProductService productService) {
         this.cartService = cartService;
+        this.productService = productService;
     }
 
     @GetMapping
@@ -46,7 +46,7 @@ public class ProductController {
         SortType sortType = SortType.from(sort);
         Pageable pageable = PageRequest.of(page, size + 1, sortType.getSort());
 
-        return productRepository.findAllByCriteria(minPrice, maxPrice, search, alphabetFilter, pageable)
+        return productService.findAllByCriteria(minPrice, maxPrice, search, alphabetFilter, pageable)
                 .collectList()
                 .map(products -> {
                             boolean hasNext = products.size() > size;
@@ -72,7 +72,7 @@ public class ProductController {
 
     @GetMapping("/{id}")
     public Mono<String> getProduct(@PathVariable long id, Model model) {
-        return productRepository.findById(id)
+        return productService.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                 .map(product -> {
                     model.addAttribute("product", product);
@@ -82,7 +82,7 @@ public class ProductController {
 
     @PostMapping(value = "/cart/add/{id}")
     public Mono<String> addToCart(@PathVariable Long id, CartForm form) {
-        return productRepository.findById(id)
+        return productService.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                 .doOnNext(product -> cartService.addCartItem(product, form.getQuantity()))
                 .thenReturn("redirect:/cart");
@@ -90,7 +90,7 @@ public class ProductController {
 
     @PostMapping("/cart/remove/{id}")
     public Mono<String> removeFromCart(@PathVariable Long id) {
-        return productRepository.findById(id)
+        return productService.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
                 .doOnNext(cartService::removeCartItem)
                 .thenReturn("redirect:/cart");
@@ -114,7 +114,7 @@ public class ProductController {
                     .doOnSuccess(unused -> product.setImageUrl("/images/" + fileName));
         }
 
-        return fileTransfer.then(productRepository.save(product))
+        return fileTransfer.then(productService.save(product))
                 .thenReturn("redirect:/products");
     }
 }
