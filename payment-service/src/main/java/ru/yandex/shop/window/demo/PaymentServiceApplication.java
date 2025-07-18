@@ -1,4 +1,4 @@
-package ru.yandex.shop.window.demo.payment;
+package ru.yandex.shop.window.demo;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

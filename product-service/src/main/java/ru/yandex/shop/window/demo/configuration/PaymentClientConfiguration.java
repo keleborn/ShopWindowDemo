@@ -10,6 +10,11 @@ import ru.yandex.shop.window.demo.client.api.PaymentApi;
 public class PaymentClientConfiguration {
 
     @Bean
+    public WebClient webClient(WebClient.Builder webClientBuilder) {
+        return webClientBuilder.build();
+    }
+
+    @Bean
     public ApiClient paymentApiClient(WebClient webClient) {
         return new ApiClient(webClient)
                 .setBasePath("http://localhost:8081");

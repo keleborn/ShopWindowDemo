@@ -5,7 +5,7 @@ info:
   description: API для обработки платежей
 
 paths:
-  /payments:
+  /api/payment:
     post:
       tags:
         - Payment
@@ -26,13 +26,14 @@ paths:
                 $ref: '#/components/schemas/PaymentResponse'
         '400':
           description: Недостаточно средств
-  /balance/{userId}:
+  /api/payment/{username}:
     get:
       tags:
         - Payment
       summary: Проверка баланса
+      operationId: getBalance
       parameters:
-        - name: userId
+        - name: username
           in: path
           required: true
           schema:

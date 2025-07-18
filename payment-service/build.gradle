@@ -2,33 +2,65 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '3.5.3'
     id 'io.spring.dependency-management' version '1.1.7'
-    id "org.openapi.generator" version "7.12.0"
+    id "org.openapi.generator" version "7.2.0"
 }
 
 openApiGenerate {
     generatorName.set("spring")
     inputSpec.set("$projectDir/src/main/resources/api-spec.yaml")
     outputDir.set("$projectDir/build/generated")
-    modelPackage.set("ru.yandex.shop.window.demo.model.domain")
-    apiPackage.set("ru.yandex.shop.window.demo.api")
+    modelPackage.set("ru.yandex.shop.window.demo.server.model")
+    apiPackage.set("ru.yandex.shop.window.demo.server.api")
     configOptions.set([
             sourceFolder: "src/gen/java/main/codegen",
             interfaceOnly: "false",
             library: "spring-boot",
+            reactive: "true",
             useTags: "true"
     ])
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir "$buildDir/generated/src/gen/java/main/codegen"
+        }
+    }
+}
+
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.5.0'
     implementation 'org.openapitools:jackson-databind-nullable:0.2.4'
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'io.swagger.core.v3:swagger-models:2.2.15'
     compileOnly 'com.google.code.findbugs:jsr305:3.0.0'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
+springBoot {
+    mainClass = 'ru.yandex.shop.window.demo.PaymentServiceApplication'
+}
+
 tasks.withType(Jar) {
     manifest {
-        attributes['Main-Class'] = 'ru.yandex.shop.window.demo.payment.PaymentServiceApplication'
+        attributes['Main-Class'] = 'ru.yandex.shop.window.demo.PaymentServiceApplication'
+    }
+}
+
+tasks.named("compileJava") {
+    dependsOn(tasks.named("openApiGenerate"))
+}
+
+tasks.named("openApiGenerate") {
+    doFirst {
+        copy {
+            from("$projectDir/.openapi-generator-ignore") into ("$buildDir/generated")
+        }
     }
 }

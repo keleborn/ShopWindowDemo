@@ -24,8 +24,8 @@ public class PaymentService {
                 .map(PaymentResponse::getSuccess);
     }
 
-    public Mono<BigDecimal> getBalance(String userId) {
-        return paymentApi.balanceUserIdGet(userId)
+    public Mono<BigDecimal> getBalance(String user) {
+        return paymentApi.getBalance(user)
                 .map(BalanceResponse::getBalance);
     }
 }
