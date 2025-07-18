@@ -10,11 +10,12 @@ import ru.yandex.shop.window.demo.repository.OrderItemRepository;
 import ru.yandex.shop.window.demo.repository.OrderRepository;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class OrderService {
-    private OrderRepository orderRepository;
-    private OrderItemRepository orderItemRepository;
+    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
     public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
         this.orderRepository = orderRepository;
@@ -35,5 +36,16 @@ public class OrderService {
                         .collectList()
                         .map(items -> new OrderDto(order, items)))
                 .collectList();
+    }
+
+    public Mono<Order> saveOrderWithItems(OrderDto orderDto) {
+        return orderRepository.save(orderDto.getOrder())
+                .flatMap(savedOrder -> {
+                    Objects.requireNonNull(savedOrder.getId(), "Order id is null");
+                    orderDto.getOrderItems().forEach(orderItem -> orderItem.setOrderId(savedOrder.getId()));
+                    return Flux.fromIterable(orderDto.getOrderItems())
+                            .flatMap(orderItemRepository::save)
+                            .then(Mono.just(savedOrder));
+                });
     }
 }

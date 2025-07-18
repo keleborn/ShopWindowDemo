@@ -5,9 +5,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Mono;
+import ru.yandex.shop.window.demo.client.api.PaymentApi;
+import ru.yandex.shop.window.demo.client.model.PaymentResponse;
+import ru.yandex.shop.window.demo.configuration.WebClientConfiguration;
 import ru.yandex.shop.window.demo.model.Product;
 import ru.yandex.shop.window.demo.repository.OrderItemRepository;
 import ru.yandex.shop.window.demo.repository.OrderRepository;
@@ -18,9 +24,12 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
+@Import(WebClientConfiguration.class)
 public class CartControllerIT {
     private Product savedProduct;
 
@@ -38,6 +47,9 @@ public class CartControllerIT {
 
     @Autowired
     private CartService cartService;
+
+    @MockitoBean
+    private PaymentApi paymentApi;
 
     @Autowired
     private WebTestClient webTestClient;
@@ -66,6 +78,11 @@ public class CartControllerIT {
 
     @Test
     void processCheckout_shouldClearCartAndSaveOrderAndRedirectToOrderPage() {
+        PaymentResponse response = new PaymentResponse();
+        response.setSuccess(true);
+
+        when(paymentApi.processPayment(any())).thenReturn(Mono.just(response));
+
         webClient.post().uri("/cart/checkout")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("customerName", "John"))

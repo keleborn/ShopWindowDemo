@@ -5,9 +5,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import ru.yandex.shop.window.demo.configuration.WebClientConfiguration;
 import ru.yandex.shop.window.demo.model.Product;
 import ru.yandex.shop.window.demo.repository.ProductRepository;
 import ru.yandex.shop.window.demo.services.CartService;
@@ -19,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
+@Import(WebClientConfiguration.class)
 public class ProductControllerIT {
     private Product savedProduct;
 

@@ -10,14 +10,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
-import ru.yandex.shop.window.demo.model.Order;
-import ru.yandex.shop.window.demo.model.OrderItem;
-import ru.yandex.shop.window.demo.repository.OrderItemRepository;
-import ru.yandex.shop.window.demo.repository.OrderRepository;
 import ru.yandex.shop.window.demo.controllers.CartController;
 import ru.yandex.shop.window.demo.model.CartItem;
+import ru.yandex.shop.window.demo.model.Order;
+import ru.yandex.shop.window.demo.model.OrderDto;
 import ru.yandex.shop.window.demo.model.Product;
 import ru.yandex.shop.window.demo.services.CartService;
+import ru.yandex.shop.window.demo.services.OrderService;
+import ru.yandex.shop.window.demo.services.PaymentService;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -38,10 +38,10 @@ public class CartControllerUnitTest {
     private CartService cartService;
 
     @MockitoBean
-    private OrderRepository orderRepository;
+    private OrderService orderService;
 
     @MockitoBean
-    private OrderItemRepository orderItemRepository;
+    private PaymentService paymentService;
 
     @BeforeEach
     void setUp() {
@@ -96,8 +96,8 @@ public class CartControllerUnitTest {
         order.setId(10L);
 
         when(cartService.getCartItems()).thenReturn(mockItems);
-        when(orderRepository.save(any(Order.class))).thenReturn(Mono.just(order));
-        when(orderItemRepository.save(any(OrderItem.class))).thenReturn(Mono.empty());
+        when(paymentService.processPayment(any(), any())).thenReturn(Mono.just(true));
+        when(orderService.saveOrderWithItems(any(OrderDto.class))).thenReturn(Mono.just(order));
         doNothing().when(cartService).clearCart();
 
         webClient.post().uri("/cart/checkout")
@@ -107,7 +107,7 @@ public class CartControllerUnitTest {
                 .expectStatus().is3xxRedirection()
                 .expectHeader().valueEquals("Location", "/orders/10");
 
-        Mockito.verify(orderRepository).save(argThat(saved -> saved.getCustomerName().equals(order.getCustomerName())));
+        Mockito.verify(orderService).saveOrderWithItems(argThat(saved -> saved.getOrder().getCustomerName().equals(order.getCustomerName())));
 
     }
 }

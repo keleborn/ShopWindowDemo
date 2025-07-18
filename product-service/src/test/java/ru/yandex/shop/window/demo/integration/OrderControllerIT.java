@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import ru.yandex.shop.window.demo.configuration.WebClientConfiguration;
 import ru.yandex.shop.window.demo.model.Order;
 import ru.yandex.shop.window.demo.model.OrderItem;
 import ru.yandex.shop.window.demo.repository.OrderItemRepository;
@@ -19,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
+@Import(WebClientConfiguration.class)
 public class OrderControllerIT {
     private Order order;
     @Autowired

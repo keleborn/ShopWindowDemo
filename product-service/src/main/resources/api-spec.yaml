@@ -51,7 +51,7 @@ components:
     PaymentRequest:
       type: object
       required:
-        - orderId
+        - userId
         - amount
       properties:
         userName:
