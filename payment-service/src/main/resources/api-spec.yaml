@@ -1,0 +1,45 @@
+openapi: 3.0.3
+info:
+  titel: Payment API
+  version: 1.0.0
+  description: API для обработки платежей
+
+paths:
+  /api/payments:
+    post:
+      summary: Обработка платежа
+      operationId: processPayment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '200':
+          description: Платеж обработан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          description: Ошибка в данных платежа
+components:
+  schemas:
+    PaymentRequest:
+      type: object
+      required:
+        - orderId
+        - amount
+        - method
+      properties:
+        orderId:
+          type: integer
+          format: int64
+          example: 3
+        amount:
+          type: number
+          format: double
+          example: 100.99
+        method:
+          type: string

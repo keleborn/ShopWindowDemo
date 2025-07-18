@@ -1,0 +1,2 @@
+rootProject.name = 'ShopWindowDemo'
+include 'product-service', 'payment-service'

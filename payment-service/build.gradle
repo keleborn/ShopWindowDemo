@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id "org.openapi.generator" version "7.12.0"
+}
+
+openApiGenerate {
+    generatorName.set("spring")
+    inputSpec.set("$projectDir/src/main/resources/api-spec.yaml")
+    outputDir.set("$projectDir/build/generated")
+    modelPackage.set("ru.yandex.shop.window.demo.model.domain")
+    apiPackage.set("ru.yandex.shop.window.demo.api")
+    configOptions.set([
+            sourceFolder: "src/gen/java/main/codegen",
+            interfaceOnly: "false",
+            library: "spring-boot",
+            useTags: "true"
+    ])
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'com.github.codemonstur:embedded-redis:1.4.3'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.withType(Jar) {
+    manifest {
+        attributes['Main-Class'] = 'ru.yandex.shop.window.demo.payment.PaymentServiceApplication'
+    }
+}
