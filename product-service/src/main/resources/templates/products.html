@@ -11,6 +11,9 @@
 <div style="text-align: right;">
     <a th:href="@{/orders}">Заказы</a>
 </div>
+<div style="text-align: right;">
+    <a th:href="@{/balance}">Проверить баланс</a>
+</div>
 <h1>Витрина товаров</h1>
 <form th:action="@{/products}" method="get">
     <input type="text" name="search" placeholder="Поиск" th:value="${search}">

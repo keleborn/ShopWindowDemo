@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Баланс</title>
+</head>
+<body>
+<div style="text-align: right;">
+    <a th:href="@{/cart}">Корзина</a>
+</div>
+<div style="text-align: right;">
+    <a th:href="@{/orders}">Заказы</a>
+</div>
+
+<form th:action="@{/balance}" method="post">
+    <input type="text" name="username" placeholder="Введите имя..." required/>
+    <button type="submit">Проверить баланс</button>
+</form>
+
+<div th:if="${balance != null}">
+    <p>Текущий баланс: <b th:text="${balance}">0.00</b></p>
+</div>
+
+<p>Такой пользователь не найден</p>
+</body>

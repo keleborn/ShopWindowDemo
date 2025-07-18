@@ -52,7 +52,7 @@ components:
     PaymentRequest:
       type: object
       required:
-        - userId
+        - userName
         - amount
       properties:
         userName:

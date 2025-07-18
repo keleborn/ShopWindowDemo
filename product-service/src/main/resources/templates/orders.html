@@ -12,6 +12,9 @@
 <div style="text-align: right;">
     <a th:href="@{/orders}">Заказы</a>
 </div>
+<div style="text-align: right;">
+    <a th:href="@{/balance}">Проверить баланс</a>
+</div>
 <div th:if="${#lists.isEmpty(orders)}">
     <p>Пусто.</p>
 </div>

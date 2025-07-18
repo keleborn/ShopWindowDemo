@@ -11,6 +11,9 @@
 <div style="text-align: right;">
     <a th:href="@{/orders}">Заказы</a>
 </div>
+<div style="text-align: right;">
+    <a th:href="@{/balance}">Проверить баланс</a>
+</div>
 <p>
     <strong>Дата заказа: </strong>
     <span th:text="${#temporals.format(order.getOrder().getCreatedAt(), 'dd.MM.yyyy HH:mm')}"></span>

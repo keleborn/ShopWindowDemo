@@ -10,8 +10,6 @@ import ru.yandex.shop.window.demo.server.model.PaymentRequest;
 import ru.yandex.shop.window.demo.server.model.PaymentResponse;
 import ru.yandex.shop.window.demo.service.PaymentProcessingService;
 
-import java.math.BigDecimal;
-
 @RestController
 public class PaymentApiController implements PaymentApi {
     private final PaymentProcessingService paymentService;
@@ -22,11 +20,11 @@ public class PaymentApiController implements PaymentApi {
 
     @Override
     public Mono<ResponseEntity<PaymentResponse>> processPayment(Mono<PaymentRequest> paymentRequest, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(new PaymentResponse().success(true)));
+        return paymentRequest.flatMap(paymentService::processPayment);
     }
 
     @Override
     public Mono<ResponseEntity<BalanceResponse>> getBalance(String username, ServerWebExchange exchange) {
-        return Mono.just(ResponseEntity.ok(new BalanceResponse().balance(BigDecimal.ZERO).userId(username)));
+        return paymentService.getBalance(username);
     }
 }

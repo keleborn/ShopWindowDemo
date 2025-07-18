@@ -6,7 +6,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import ru.yandex.shop.window.demo.configuration.EmbeddedRedisConfiguration;
-import ru.yandex.shop.window.demo.configuration.WebClientConfiguration;
 import ru.yandex.shop.window.demo.model.Product;
 import ru.yandex.shop.window.demo.repository.ProductRepository;
 import ru.yandex.shop.window.demo.services.ProductService;
@@ -16,7 +15,7 @@ import java.math.BigDecimal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Import({EmbeddedRedisConfiguration.class, WebClientConfiguration.class})
+@Import(EmbeddedRedisConfiguration.class)
 public class ProductRedisCacheIT {
     @Autowired
     private ReactiveRedisTemplate<String, Product> redisTemplate;
