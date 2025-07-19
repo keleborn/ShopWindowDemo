@@ -15,6 +15,22 @@ spring:
       port: 6379
       password:
       database: 0
+  security:
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: product-service-client
+            client-secret: product-service-secret
+            authorization-grant-type: authorization_code
+            redirect-uri: '{baseUrl}/{action}/oauth2/code/{registrationId}'
+            scope:
+              - openid
+              - profile
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8083/realms/shop
+            user-name-attribute: preferred_username
 logging:
   level:
     org.springframework.r2dbc.core.DefaultDatabaseClient: DEBUG
