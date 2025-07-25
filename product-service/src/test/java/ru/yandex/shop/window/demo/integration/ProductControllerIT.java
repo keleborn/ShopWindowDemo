@@ -3,8 +3,6 @@ package ru.yandex.shop.window.demo.integration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
@@ -17,9 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@AutoConfigureWebTestClient
-public class ProductControllerIT {
+public class ProductControllerIT extends AbstractAuthenticatedIT {
     private Product savedProduct;
 
     @Autowired
@@ -73,7 +69,7 @@ public class ProductControllerIT {
 
     @Test
     void addToCart_shouldAddProductToCartAndRedirectToCartPage() {
-        webTestClient.post().uri("/products/cart/add/" + savedProduct.getId())
+        authenticatedClient.post().uri("/products/cart/add/" + savedProduct.getId())
                 .bodyValue("quantity=5")
                 .exchange()
                 .expectStatus().is3xxRedirection()
@@ -87,7 +83,7 @@ public class ProductControllerIT {
     void removeFromCart_shouldRemoveProductFromCartAndRedirectToCartPage() {
         cartService.addCartItem(savedProduct, 15);
 
-        webTestClient.post().uri("/products/cart/remove/" + savedProduct.getId())
+        authenticatedClient.post().uri("/products/cart/remove/" + savedProduct.getId())
                 .exchange()
                 .expectStatus().is3xxRedirection()
                 .expectHeader().valueEquals("Location", "/cart");

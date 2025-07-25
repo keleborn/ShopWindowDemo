@@ -3,8 +3,6 @@ package ru.yandex.shop.window.demo.integration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.yandex.shop.window.demo.model.Order;
 import ru.yandex.shop.window.demo.model.OrderItem;
@@ -17,10 +15,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@AutoConfigureWebTestClient
-public class OrderControllerIT {
+public class OrderControllerIT extends AbstractAuthenticatedIT {
     private Order order;
+
     @Autowired
     private WebTestClient webClient;
 
@@ -46,7 +43,7 @@ public class OrderControllerIT {
 
     @Test
     void getOrders_shouldReturnAllOrders() {
-        webClient.get().uri("/orders")
+        authenticatedClient.get().uri("/orders")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)
@@ -59,7 +56,7 @@ public class OrderControllerIT {
 
     @Test
     void getOrder_shouldReturnOrderById() {
-        webClient.get().uri("/orders/" + order.getId())
+        authenticatedClient.get().uri("/orders/" + order.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)

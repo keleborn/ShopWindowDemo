@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Товары</title>
@@ -14,6 +15,22 @@
 <div style="text-align: right;">
     <a th:href="@{/balance}">Проверить баланс</a>
 </div>
+<div style="text-align: right;">
+    <div th:unless="${authenticated}">
+        <a th:href="@{/oauth2/authorization/keycloak}">Войти</a>
+    </div>
+    <div th:if="${authenticated}">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+    </div>
+    <div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">TestLogout</button>
+        </form>
+    </div>
+</div>
+
 <h1>Витрина товаров</h1>
 <form th:action="@{/products}" method="get">
     <input type="text" name="search" placeholder="Поиск" th:value="${search}">

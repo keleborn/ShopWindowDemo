@@ -2,11 +2,9 @@ package ru.yandex.shop.window.demo.integration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -28,9 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@AutoConfigureWebTestClient
-public class CartControllerIT {
+public class CartControllerIT extends AbstractAuthenticatedIT{
     private Product savedProduct;
 
     @Autowired
@@ -51,9 +47,6 @@ public class CartControllerIT {
     @MockitoBean
     private PaymentApi paymentApi;
 
-    @Autowired
-    private WebTestClient webTestClient;
-
     @BeforeEach
     void setUp() {
         orderItemRepository.deleteAll().block();
@@ -66,7 +59,7 @@ public class CartControllerIT {
 
     @Test
     void updateCart_shouldUpdateCartAndRedirectToCartPage() {
-        webClient.post().uri("/cart/update/" + savedProduct.getId())
+        authenticatedClient.post().uri("/cart/update/" + savedProduct.getId())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("quantity", "10"))
                 .exchange()
@@ -83,7 +76,7 @@ public class CartControllerIT {
 
         when(paymentApi.processPayment(any())).thenReturn(Mono.just(response));
 
-        webClient.post().uri("/cart/checkout")
+        authenticatedClient.post().uri("/cart/checkout")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("customerName", "John"))
                 .exchange()
@@ -98,7 +91,7 @@ public class CartControllerIT {
     void processCheckout_shouldReturnErrorPageWhenServerError() {
         when(paymentApi.processPayment(any())).thenReturn(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
 
-        webClient.post().uri("/cart/checkout")
+        authenticatedClient.post().uri("/cart/checkout")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("customerName", "John"))
                 .exchange()
@@ -107,5 +100,43 @@ public class CartControllerIT {
 
         assertThat(cartService.getCartItems().size()).isNotEqualTo(0);
         assertThat(orderRepository.findAll().blockLast()).isEqualTo(null);
+    }
+
+    @Test
+    void showCart_shouldReturnCartPage() {
+        authenticatedClient.get().uri("/cart")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(rs -> {
+                    String html = rs.getResponseBody();
+                    assertThat(html).contains("test");
+                    assertThat(html).contains("10");
+                    assertThat(html).contains("<title>Корзина</title>");
+                });
+    }
+
+    @Test
+    void updateCart_shouldUpdateProductQuantity() {
+        authenticatedClient.post().uri("/cart/update/1")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .bodyValue("quantity=5")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().valueEquals("Location", "/cart");
+
+        assertThat(cartService.getCartItems().iterator().next().getQuantity()).isEqualTo(5);
+    }
+
+    @Test
+    void checkout_shouldShowOrder() {
+        authenticatedClient.get().uri("/cart/checkout")
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(String.class)
+                .consumeWith(rs -> {
+                    String html = rs.getResponseBody();
+                    assertThat(html).contains("order");
+                });
     }
 }

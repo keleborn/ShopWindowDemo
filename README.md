@@ -1,3 +1,4 @@
+### Краткое описание
 Проект из 2х модулей:
 * product-service
 * payment-service
@@ -9,3 +10,18 @@
 * http://localhost:8083/ - keycloak ui
 
 Запуск keycloak производится через `docker-compose up --build` команду. docker-compose.yaml лежит в корне проекта.
+
+### Настройка keycloak
+Создать реалм _shop_
+
+Создать два клиента:
+* product-service-client
+* payment-service-client
+
+#### product-service-client:
+* **Root Url** = http://localhost:8080
+* **Valid redirect URIs** = http://localhost:8080/*
+* **Valid post logout redirect URIs** = http://localhost:8080/*
+* **Client Authentication** = on
+* **Authorization** = on
+* **Authentication flow** = Standard flow, Direct access grants, Service account roles
