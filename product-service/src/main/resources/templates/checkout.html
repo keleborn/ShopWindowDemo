@@ -15,29 +15,19 @@
 <div style="text-align: right;">
     <a th:href="@{/balance}">Проверить баланс</a>
 </div>
+<div style="text-align: right;">
+    <div th:if="${authenticated}">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+    </div>
+</div>
 <form th:action="@{/cart/checkout}" th:object="${order}" method="post">
     <label>Имя:</label>
     <input type="text" th:field="*{customerName}" required><br>
     <button type="submit">Заказать</button>
 </form>
-<!--<hr/>-->
-<!--<form id="balanceFrom">-->
-<!--    <input type="text" id="username" placeholder="Имя пользователя..." required>-->
-<!--    <button type="submit">Проверить баланс</button>-->
-<!--</form>-->
-<!--<p id="result"></p>-->
-<!--<script>-->
-<!--    document.getElementById('balanceFrom').addEventListener('submit', async function(e) {-->
-<!--        e.preventDefault();-->
-<!--        const username = document.getElementById('username').value;-->
-<!--        -->
-<!--        const response = await fetch(`/balance/${encodeURIComponent(username)}`);-->
-<!--        if (response.ok) {-->
-<!--            const balance = await response.text();-->
-<!--            -->
-<!--            document.getElementById('result').textContent = 'Не удалось';-->
-<!--        }-->
-<!--    });-->
-<!--</script>-->
+<hr>
+<a th:href="@{/products}">Назад к витрине</a>
 </body>
 </html>

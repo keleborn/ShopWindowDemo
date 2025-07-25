@@ -1,11 +1,13 @@
 package ru.yandex.shop.window.demo.controllers;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
 import ru.yandex.shop.window.demo.model.CartForm;
 import ru.yandex.shop.window.demo.model.CartItem;
@@ -68,6 +70,14 @@ public class CartController {
                 .flatMap(success -> orderService.saveOrderWithItems(new OrderDto(order, orderItems))
                         .doOnNext(saved -> cartService.clearCart())
                         .map(saved -> "redirect:/orders/" + saved.getId()))
-                .onErrorResume(e -> Mono.just("redirect:/payment-error"));
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+                        return Mono.just("redirect:/balance/404");
+                    }
+                    if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                        return Mono.just("redirect:/balance/400");
+                    }
+                    return Mono.just("redirect:/balance/payment-error");
+                });
     }
 }

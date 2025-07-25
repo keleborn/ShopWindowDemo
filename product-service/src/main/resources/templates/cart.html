@@ -15,6 +15,13 @@
 <div style="text-align: right;">
     <a th:href="@{/balance}">Проверить баланс</a>
 </div>
+<div style="text-align: right;">
+    <div th:if="${authenticated}">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+    </div>
+</div>
 <div th:if="${#lists.isEmpty(items)}">
     <p>Пусто.</p>
 </div>

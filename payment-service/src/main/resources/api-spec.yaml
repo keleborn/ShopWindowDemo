@@ -48,6 +48,11 @@ paths:
         '404':
           description: Нет баланса для данного пользователя
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
     PaymentRequest:
       type: object
@@ -80,3 +85,5 @@ components:
           type: string
           format: decimal
           example: 100.23
+security:
+  - bearerAuth: []

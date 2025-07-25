@@ -15,6 +15,13 @@
 <div style="text-align: right;">
     <a th:href="@{/balance}">Проверить баланс</a>
 </div>
+<div style="text-align: right;">
+    <div th:if="${authenticated}">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+    </div>
+</div>
 
 <form th:action="@{/products}" th:object="${product}" method="post" enctype="multipart/form-data">
     <label>

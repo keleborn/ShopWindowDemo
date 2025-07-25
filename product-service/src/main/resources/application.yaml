@@ -25,6 +25,12 @@ spring:
             authorization-grant-type: authorization_code
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
             scope: openid, profile
+          payment-service-client:
+            client-id: payment-service-client
+            client-secret: KNm0PqYh64gbfYnaWqf4uYtsyaumtMiE
+            authorization-grant-type: client_credentials
+            scope: openid
+            provider: keycloak
         provider:
           keycloak:
             issuer-uri: http://localhost:8083/realms/shop

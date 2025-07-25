@@ -11,6 +11,13 @@
 <div style="text-align: right;">
     <a th:href="@{/orders}">Заказы</a>
 </div>
+<div style="text-align: right;">
+    <div th:if="${authenticated}">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+    </div>
+</div>
 
 <form th:action="@{/balance}" method="post">
     <input type="text" name="username" placeholder="Введите имя..." required/>
@@ -22,4 +29,6 @@
 </div>
 
 <p>Такой пользователь не найден</p>
+<hr>
+<a th:href="@{/products}">Назад к витрине</a>
 </body>

@@ -14,6 +14,16 @@
 <div style="text-align: right;">
     <a th:href="@{/balance}">Проверить баланс</a>
 </div>
+<div style="text-align: right;">
+    <div th:unless="${authenticated}">
+        <a th:href="@{/oauth2/authorization/keycloak}">Войти</a>
+    </div>
+    <div th:if="${authenticated}">
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Выйти</button>
+        </form>
+    </div>
+</div>
 <div>
     <p><strong>Название:</strong> <span th:text="${product.name}"></span></p>
     <p><strong>Описание:</strong> <span th:text="${product.description}"></span></p>

@@ -1,11 +1,14 @@
 package ru.yandex.shop.window.demo.integration;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import ru.yandex.shop.window.demo.controllers.PaymentApiController;
 import ru.yandex.shop.window.demo.server.model.PaymentRequest;
 import ru.yandex.shop.window.demo.service.PaymentProcessingService;
 
@@ -14,11 +17,17 @@ import java.math.BigDecimal;
 @SpringBootTest
 @AutoConfigureWebTestClient
 public class PaymentApiControllerIT {
-    @Autowired
     private WebTestClient webClient;
 
     @Autowired
     private PaymentProcessingService paymentProcessingService;
+
+    @BeforeEach
+    public void setUp() {
+        webClient = WebTestClient.bindToController(new PaymentApiController(paymentProcessingService))
+                .apply(SecurityMockServerConfigurers.mockJwt())
+                .build();
+    }
 
     @Test
     void processPayment_shouldReturn200() {
