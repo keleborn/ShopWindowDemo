@@ -17,7 +17,7 @@
 </div>
 <div style="text-align: right;">
     <div th:unless="${authenticated}">
-        <a th:href="@{/oauth2/authorization/keycloak}">Войти</a>
+        <a th:href="@{/login}">Войти</a>
     </div>
     <div th:if="${authenticated}">
         <form th:action="@{/logout}" method="post">

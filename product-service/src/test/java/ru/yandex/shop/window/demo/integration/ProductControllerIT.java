@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProductControllerIT extends AbstractAuthenticatedIT {
     private Product savedProduct;
+    private final String username = "test";
 
     @Autowired
     private WebTestClient webClient;
@@ -33,7 +34,7 @@ public class ProductControllerIT extends AbstractAuthenticatedIT {
     @BeforeEach
     void setUp() {
         productRepository.deleteAll().block();
-        cartService.clearCart();
+        cartService.clearCart(username);
         savedProduct = productRepository.saveAll(List.of(new Product("test1", "description1", BigDecimal.valueOf(10), true),
                 new Product("test2", "description2", BigDecimal.valueOf(10), true))).blockLast();
     }
@@ -75,20 +76,20 @@ public class ProductControllerIT extends AbstractAuthenticatedIT {
                 .expectStatus().is3xxRedirection()
                 .expectHeader().valueEquals("Location", "/cart");
 
-        assertThat(cartService.getCartItems().size()).isEqualTo(1);
-        assertThat(cartService.getCartItems().iterator().next().getProduct().getId()).isEqualTo(savedProduct.getId());
+        assertThat(cartService.getCartItems(username).size()).isEqualTo(1);
+        assertThat(cartService.getCartItems(username).iterator().next().getProduct().getId()).isEqualTo(savedProduct.getId());
     }
 
     @Test
     void removeFromCart_shouldRemoveProductFromCartAndRedirectToCartPage() {
-        cartService.addCartItem(savedProduct, 15);
+        cartService.addCartItem(username, savedProduct, 15);
 
         authenticatedClient.post().uri("/products/cart/remove/" + savedProduct.getId())
                 .exchange()
                 .expectStatus().is3xxRedirection()
                 .expectHeader().valueEquals("Location", "/cart");
 
-        assertThat(cartService.getCartItems().size()).isEqualTo(0);
+        assertThat(cartService.getCartItems(username).size()).isEqualTo(0);
     }
 
     @Test

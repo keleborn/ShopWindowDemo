@@ -11,3 +11,7 @@ insert into products(name, description, price, is_available) values ('Tens', 'ty
 insert into products(name, description, price, is_available) values ('Elevens', 'asdf', 888, false);
 insert into products(name, description, price, is_available) values ('Twelves', 'sdfg', 0.23, true);
 insert into products(name, description, price, is_available) values ('Thirteens', 'zxcv', 2354, true);
+
+insert into users(username, password, roles) values ('test', '$2a$12$ydZS4mc44QsJ5YLmysVnHumWpxiTVKoHQtFjkcylrdQA6z0Vji6pu', 'USER');
+insert into users(username, password, roles) values ('John', '$2a$12$yr9fVX15m5pxvBuiGjAt0eR3eQsQCFBwFf5jV9pGuZpY8yLv8Y/Gy', 'USER');
+insert into users(username, password, roles) values ('Ivan', '$2a$12$4R.GAFMq7etE51XWka6mBeiPGuXF9w4SX8YOfpnEOjzYxzkw/2f/q', 'USER');

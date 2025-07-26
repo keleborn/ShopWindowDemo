@@ -21,3 +21,10 @@ CREATE TABLE IF NOT EXISTS order_items(
     quantity INT NOT NULL,
     image_url VARCHAR(255)
 );
+
+CREATE TABLE IF NOT EXISTS users(
+    id  bigserial PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    roles VARCHAR(255) NOT NULL
+)

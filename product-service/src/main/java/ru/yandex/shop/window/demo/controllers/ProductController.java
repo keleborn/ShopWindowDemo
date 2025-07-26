@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.util.UUID;
 
 @Controller
@@ -81,18 +82,18 @@ public class ProductController {
     }
 
     @PostMapping(value = "/cart/add/{id}")
-    public Mono<String> addToCart(@PathVariable Long id, CartForm form) {
+    public Mono<String> addToCart(@PathVariable Long id, CartForm form, Principal principal) {
         return productService.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                .doOnNext(product -> cartService.addCartItem(product, form.getQuantity()))
+                .doOnNext(product -> cartService.addCartItem(principal.getName(), product, form.getQuantity()))
                 .thenReturn("redirect:/cart");
     }
 
     @PostMapping("/cart/remove/{id}")
-    public Mono<String> removeFromCart(@PathVariable Long id) {
+    public Mono<String> removeFromCart(@PathVariable Long id, Principal principal) {
         return productService.findById(id)
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                .doOnNext(cartService::removeCartItem)
+                .doOnNext(product -> cartService.removeCartItem(principal.getName(), product))
                 .thenReturn("redirect:/cart");
     }
 

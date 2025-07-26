@@ -8,12 +8,14 @@ import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class CartService {
-    private final Map<Long, CartItem> cart = new HashMap<Long, CartItem>();
+    private final Map<String, Map<Long, CartItem>> carts = new ConcurrentHashMap<>();
 
-    public void addCartItem(Product product, int quantity) {
+    public void addCartItem(String username, Product product, int quantity) {
+        Map<Long, CartItem> cart = carts.computeIfAbsent(username, u -> new HashMap<>());
         cart.compute(product.getId(), (id, item) -> {
             if (item == null) {
                 return new CartItem(product, quantity);
@@ -23,25 +25,30 @@ public class CartService {
         });
     }
 
-    public void removeCartItem(Product product) {
+    public void removeCartItem(String username, Product product) {
+        Map<Long, CartItem> cart = carts.computeIfAbsent(username, u -> new HashMap<>());
         cart.remove(product.getId());
     }
 
-    public Collection<CartItem> getCartItems() {
+    public Collection<CartItem> getCartItems(String username) {
+        Map<Long, CartItem> cart = carts.computeIfAbsent(username, u -> new HashMap<>());
         return cart.values();
     }
 
-    public BigDecimal getTotal() {
+    public BigDecimal getTotal(String username) {
+        Map<Long, CartItem> cart = carts.computeIfAbsent(username, u -> new HashMap<>());
         return cart.values().stream()
                 .map(item -> item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public void clearCart() {
+    public void clearCart(String username) {
+        Map<Long, CartItem> cart = carts.computeIfAbsent(username, u -> new HashMap<>());
         cart.clear();
     }
 
-    public void setQuantity(Long id, int quantity) {
+    public void setQuantity(String username, Long id, int quantity) {
+        Map<Long, CartItem> cart = carts.computeIfAbsent(username, u -> new HashMap<>());
         if (quantity <= 0) {
             cart.remove(id);
         } else {

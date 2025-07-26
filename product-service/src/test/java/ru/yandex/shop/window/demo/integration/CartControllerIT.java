@@ -2,13 +2,14 @@ package ru.yandex.shop.window.demo.integration;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import ru.yandex.shop.window.demo.client.api.PaymentApi;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 public class CartControllerIT extends AbstractAuthenticatedIT{
     private Product savedProduct;
+    private final String username = "test";
 
     @Autowired
     private WebTestClient webClient;
@@ -51,10 +53,10 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
     void setUp() {
         orderItemRepository.deleteAll().block();
         orderRepository.deleteAll().block();
-        cartService.clearCart();
+        cartService.clearCart(username);
         savedProduct = productRepository.saveAll(List.of(new Product("test1", "description1", BigDecimal.valueOf(10), true),
                 new Product("test2", "description2", BigDecimal.valueOf(10), true))).blockLast();
-        cartService.addCartItem(savedProduct, 5);
+        cartService.addCartItem(username, savedProduct, 5);
     }
 
     @Test
@@ -66,7 +68,7 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
                 .expectStatus().is3xxRedirection()
                 .expectHeader().valueEquals("Location", "/cart");
 
-        assertThat(cartService.getCartItems().iterator().next().getQuantity()).isEqualTo(10);
+        assertThat(cartService.getCartItems(username).iterator().next().getQuantity()).isEqualTo(10);
     }
 
     @Test
@@ -83,22 +85,27 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
                 .expectStatus().is3xxRedirection()
                 .expectHeader().valueEquals("Location", "/orders/1");
 
-        assertThat(cartService.getCartItems().size()).isEqualTo(0);
+        assertThat(cartService.getCartItems(username).size()).isEqualTo(0);
         assertThat(orderRepository.findAll().blockLast().getCustomerName()).isEqualTo("John");
     }
 
     @Test
     void processCheckout_shouldReturnErrorPageWhenServerError() {
-        when(paymentApi.processPayment(any())).thenReturn(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)));
+        when(paymentApi.processPayment(any())).thenReturn(Mono.error(WebClientResponseException.create(
+                HttpStatus.NOT_FOUND.value(),
+                "not found",
+                HttpHeaders.EMPTY,
+                null,
+                null)));
 
         authenticatedClient.post().uri("/cart/checkout")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(BodyInserters.fromFormData("customerName", "John"))
+                .body(BodyInserters.fromFormData("customerName", "test"))
                 .exchange()
                 .expectStatus().is3xxRedirection()
-                .expectHeader().valueEquals("Location", "/payment-error");
+                .expectHeader().valueEquals("Location", "/balance/404");
 
-        assertThat(cartService.getCartItems().size()).isNotEqualTo(0);
+        assertThat(cartService.getCartItems(username).size()).isNotEqualTo(0);
         assertThat(orderRepository.findAll().blockLast()).isEqualTo(null);
     }
 
@@ -117,7 +124,7 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
     }
 
     @Test
-    void updateCart_shouldUpdateProductQuantity() {
+    void updateCart_shouldUpdateProductQuantityIsolated() {
         authenticatedClient.post().uri("/cart/update/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .bodyValue("quantity=5")
@@ -125,7 +132,8 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
                 .expectStatus().is3xxRedirection()
                 .expectHeader().valueEquals("Location", "/cart");
 
-        assertThat(cartService.getCartItems().iterator().next().getQuantity()).isEqualTo(5);
+        cartService.addCartItem("John", new Product(1L, "First", "1234", BigDecimal.valueOf(1000), true, null), 10);
+        assertThat(cartService.getCartItems(username).iterator().next().getQuantity()).isEqualTo(5);
     }
 
     @Test

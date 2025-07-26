@@ -34,6 +34,7 @@ spring:
         provider:
           keycloak:
             issuer-uri: http://localhost:8083/realms/shop
+            token-uri: http://localhost:8083/realms/shop/protocol/openid-connect/token
 logging:
   level:
     org.springframework.r2dbc.core.DefaultDatabaseClient: DEBUG

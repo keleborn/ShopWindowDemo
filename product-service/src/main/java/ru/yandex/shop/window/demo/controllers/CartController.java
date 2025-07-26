@@ -18,6 +18,7 @@ import ru.yandex.shop.window.demo.services.CartService;
 import ru.yandex.shop.window.demo.services.OrderService;
 import ru.yandex.shop.window.demo.services.PaymentService;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,18 +35,18 @@ public class CartController {
     }
 
     @GetMapping("/cart")
-    public Mono<String> showCart(Model model) {
+    public Mono<String> showCart(Model model, Principal principal) {
         return Mono.fromSupplier(() -> {
-            model.addAttribute("items", cartService.getCartItems());
-            model.addAttribute("total", cartService.getTotal());
+            model.addAttribute("items", cartService.getCartItems(principal.getName()));
+            model.addAttribute("total", cartService.getTotal(principal.getName()));
             return "cart";
         });
     }
 
 
     @PostMapping("/cart/update/{id}")
-    public Mono<String> updateCart(@PathVariable Long id, CartForm form) {
-        return Mono.fromRunnable(() -> cartService.setQuantity(id, form.getQuantity()))
+    public Mono<String> updateCart(@PathVariable Long id, CartForm form, Principal principal) {
+        return Mono.fromRunnable(() -> cartService.setQuantity(principal.getName(), id, form.getQuantity()))
                 .thenReturn("redirect:/cart");
     }
 
@@ -58,17 +59,18 @@ public class CartController {
     }
 
     @PostMapping("/cart/checkout")
-    public Mono<String> processCheckout(@ModelAttribute("order") Order order) {
-        List<OrderItem> orderItems = cartService.getCartItems()
+    public Mono<String> processCheckout(@ModelAttribute("order") Order order, Principal principal) {
+        String username = principal.getName();
+        List<OrderItem> orderItems = cartService.getCartItems(username)
                 .stream()
                 .map(CartItem::toOrderItem)
                 .toList();
 
         order.setCreatedAt(LocalDateTime.now());
 
-        return paymentService.processPayment(order.getCustomerName(), cartService.getTotal())
+        return paymentService.processPayment(order.getCustomerName(), cartService.getTotal(username))
                 .flatMap(success -> orderService.saveOrderWithItems(new OrderDto(order, orderItems))
-                        .doOnNext(saved -> cartService.clearCart())
+                        .doOnNext(saved -> cartService.clearCart(username))
                         .map(saved -> "redirect:/orders/" + saved.getId()))
                 .onErrorResume(WebClientResponseException.class, ex -> {
                     if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {

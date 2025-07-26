@@ -13,6 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class CartServiceUnitTest {
+    private String username;
     private CartService cartService;
     private Product product;
     private int quantity;
@@ -26,14 +27,15 @@ public class CartServiceUnitTest {
         product.setPrice(BigDecimal.valueOf(100));
         product.setAvailable(true);
 
+        username = "test";
         quantity = 10;
     }
 
     @Test
     void addCartItem_shouldAddItemToCartAndIncreaseQuantity() {
-        cartService.addCartItem(product, quantity);
+        cartService.addCartItem(username, product, quantity);
 
-        var items = cartService.getCartItems();
+        var items = cartService.getCartItems(username);
         assertEquals(1, items.size());
         assertEquals(quantity, items.iterator().next().getQuantity());
     }
@@ -41,40 +43,59 @@ public class CartServiceUnitTest {
     @Test
     void setQuantity_shouldUpdateQuantity() {
         int initialQuantity = 1;
-        cartService.addCartItem(product, initialQuantity);
-        cartService.setQuantity(product.getId(), quantity);
+        cartService.addCartItem(username, product, initialQuantity);
+        cartService.setQuantity(username, product.getId(), quantity);
 
-        assertEquals(quantity, cartService.getCartItems().iterator().next().getQuantity());
+        assertEquals(quantity, cartService.getCartItems(username).iterator().next().getQuantity());
     }
 
     @Test
     void setQuantity_shouldRemoveItemOnZeroQuantity() {
-        cartService.addCartItem(product, quantity);
-        cartService.setQuantity(product.getId(), 0);
+        cartService.addCartItem(username, product, quantity);
+        cartService.setQuantity(username, product.getId(), 0);
 
-        assertEquals(0, cartService.getCartItems().size());
+        assertEquals(0, cartService.getCartItems(username).size());
     }
 
     @Test
     void removeCartItem_shouldRemoveItemFromCart() {
-        cartService.addCartItem(product, quantity);
-        cartService.removeCartItem(product);
+        cartService.addCartItem(username, product, quantity);
+        cartService.removeCartItem(username, product);
 
-        assertEquals(0, cartService.getCartItems().size());
+        assertEquals(0, cartService.getCartItems(username).size());
     }
 
     @Test
     void getTotal_shouldReturnTotal() {
-        cartService.addCartItem(product, quantity);
+        cartService.addCartItem(username, product, quantity);
 
-        assertEquals(BigDecimal.valueOf(quantity).multiply(product.getPrice()), cartService.getTotal());
+        assertEquals(BigDecimal.valueOf(quantity).multiply(product.getPrice()), cartService.getTotal(username));
     }
 
     @Test
     void clearCart_shouldClearCart() {
-        cartService.addCartItem(product, quantity);
+        cartService.addCartItem(username, product, quantity);
 
-        cartService.clearCart();
-        assertEquals(0, cartService.getCartItems().size());
+        cartService.clearCart(username);
+        assertEquals(0, cartService.getCartItems(username).size());
+    }
+
+    @Test
+    void clearCart_shouldNotClearCartForOtherUsers() {
+        cartService.addCartItem(username, product, quantity);
+        cartService.addCartItem("John", product, quantity);
+
+        cartService.clearCart(username);
+        assertEquals(1, cartService.getCartItems("John").size());
+    }
+
+    @Test
+    void userCart_isIsolated() {
+        cartService.addCartItem(username, product, quantity);
+        cartService.addCartItem("John", product, quantity);
+
+        assertEquals(1, cartService.getCartItems("John").size());
+        assertEquals(quantity, cartService.getCartItems("John").iterator().next().getQuantity());
+        assertEquals(1, cartService.getCartItems(username).size());
     }
 }

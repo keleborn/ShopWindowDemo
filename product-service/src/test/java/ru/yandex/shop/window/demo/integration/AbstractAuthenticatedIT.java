@@ -18,7 +18,7 @@ public abstract class AbstractAuthenticatedIT {
 
     @BeforeEach
     void setUpAuthenticatedClient() {
-        TestingAuthenticationToken mockAuth = new TestingAuthenticationToken("user", "password", "ROLE_USER");
+        TestingAuthenticationToken mockAuth = new TestingAuthenticationToken("test", "password", "ROLE_USER");
         this.authenticatedClient = webClient.mutateWith(SecurityMockServerConfigurers.mockAuthentication(mockAuth));
     }
 }
