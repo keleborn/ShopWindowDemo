@@ -1,5 +1,7 @@
 ### Краткое описание
+
 Проект из 2х модулей:
+
 * product-service
 * payment-service
 
@@ -12,18 +14,22 @@
 Запуск keycloak производится через `docker-compose up --build` команду. docker-compose.yaml лежит в корне проекта.
 
 ### Настройка keycloak
+
 Создать реалм _shop_
 
 Создать два клиента:
+
 * product-service-client
 * payment-service-client
 
 Добавить юзеров в keycloak:
+
 * John:john
 * test:test
 * Ivan:ivan
 
 #### product-service-client:
+
 * **Root Url** = http://localhost:8080
 * **Client Authentication** = on
 * **Authorization** = off

@@ -36,10 +36,10 @@ public class PaymentProcessingServiceUnitTest {
         when(accountRepository.findByUserName("user")).thenReturn(Mono.empty());
 
         StepVerifier.create(paymentProcessingService.processPayment(new PaymentRequest("user", BigDecimal.valueOf(100))))
-                        .expectErrorSatisfies(e -> {
-                            assertThat(e).isInstanceOf(ResponseStatusException.class);
-                            assertThat(((ResponseStatusException) e).getReason()).isEqualTo("Пользователь не найден");
-                        }).verify();
+                .expectErrorSatisfies(e -> {
+                    assertThat(e).isInstanceOf(ResponseStatusException.class);
+                    assertThat(((ResponseStatusException) e).getReason()).isEqualTo("Пользователь не найден");
+                }).verify();
     }
 
     @Test

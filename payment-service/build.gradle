@@ -67,7 +67,7 @@ tasks.named("compileJava") {
 tasks.named("openApiGenerate") {
     doFirst {
         copy {
-            from("$projectDir/.openapi-generator-ignore") into ("$buildDir/generated")
+            from("$projectDir/.openapi-generator-ignore") into("$buildDir/generated")
         }
     }
 }

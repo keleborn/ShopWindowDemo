@@ -6,7 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import ru.yandex.shop.window.demo.enums.SortType;
@@ -36,26 +42,26 @@ public class ProductController {
 
     @GetMapping
     public Mono<String> getProducts(Model model,
-                              @RequestParam(defaultValue = "0") int page,
-                              @RequestParam(defaultValue = "10") int size,
-                              @RequestParam(required = false) String sort,
-                              @RequestParam(required = false) String search,
-                              @RequestParam(required = false) BigDecimal minPrice,
-                              @RequestParam(required = false) BigDecimal maxPrice,
-                              @RequestParam(required = false) String alphabetFilter
-                              ) {
+                                    @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "10") int size,
+                                    @RequestParam(required = false) String sort,
+                                    @RequestParam(required = false) String search,
+                                    @RequestParam(required = false) BigDecimal minPrice,
+                                    @RequestParam(required = false) BigDecimal maxPrice,
+                                    @RequestParam(required = false) String alphabetFilter
+    ) {
         SortType sortType = SortType.from(sort);
         Pageable pageable = PageRequest.of(page, size + 1, sortType.getSort());
 
         return productService.findAllByCriteria(minPrice, maxPrice, search, alphabetFilter, pageable)
                 .collectList()
                 .map(products -> {
-                            boolean hasNext = products.size() > size;
-                            if (hasNext) {
-                                products = products.subList(0, size);
-                            }
-                            return new PagedResult<>(products, page, size, hasNext);
-                        })
+                    boolean hasNext = products.size() > size;
+                    if (hasNext) {
+                        products = products.subList(0, size);
+                    }
+                    return new PagedResult<>(products, page, size, hasNext);
+                })
                 .map(pagedResult -> {
                     model.addAttribute("productPage", pagedResult.content());
                     model.addAttribute("currentPage", pagedResult.currentPage());
@@ -67,7 +73,7 @@ public class ProductController {
                     model.addAttribute("alphabetFilter", alphabetFilter);
                     model.addAttribute("maxPrice", maxPrice);
                     model.addAttribute("minPrice", minPrice);
-                   return "products";
+                    return "products";
                 });
     }
 
