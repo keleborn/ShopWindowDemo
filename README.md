@@ -18,10 +18,13 @@
 * product-service-client
 * payment-service-client
 
+Добавить юзеров в keycloak:
+* John:john
+* test:test
+* Ivan:ivan
+
 #### product-service-client:
 * **Root Url** = http://localhost:8080
-* **Valid redirect URIs** = http://localhost:8080/*
-* **Valid post logout redirect URIs** = http://localhost:8080/*
 * **Client Authentication** = on
-* **Authorization** = on
-* **Authentication flow** = Standard flow, Direct access grants, Service account roles
+* **Authorization** = off
+* **Authentication flow** = Direct access grants

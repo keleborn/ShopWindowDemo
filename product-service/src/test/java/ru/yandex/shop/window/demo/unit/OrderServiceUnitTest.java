@@ -54,7 +54,7 @@ public class OrderServiceUnitTest {
         when(orderRepository.findAll()).thenReturn(Flux.just(order1));
         when(orderItemRepository.findByOrderId(1L)).thenReturn(Flux.just(orderItem1));
 
-        assertThat(orderService.findAllWithItems().block().size()).isEqualTo(1);
-        assertThat(orderService.findAllWithItems().block().getFirst().getOrder().getCustomerName()).isEqualTo("test1");
+        assertThat(orderService.findAllWithItems("test1").block().size()).isEqualTo(1);
+        assertThat(orderService.findAllWithItems("test1").block().getFirst().getOrder().getCustomerName()).isEqualTo("test1");
     }
 }

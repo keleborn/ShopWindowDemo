@@ -29,9 +29,10 @@ public class OrderService {
         return Mono.zip(orderMono, orderItems.collectList(), OrderDto::new);
     }
 
-    public Mono<List<OrderDto>> findAllWithItems() {
+    public Mono<List<OrderDto>> findAllWithItems(String customerName) {
         return orderRepository.findAll()
                 .sort((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
+                .filter(order -> order.getCustomerName().equals(customerName))
                 .flatMap(order -> orderItemRepository.findByOrderId(order.getId())
                         .collectList()
                         .map(items -> new OrderDto(order, items)))

@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>OAuth2 авторизация</title>
+</head>
+<body>
+<h1>OAuth2 авторизация</h1>
+<form th:action="@{/oauth2/keycloak}" method="post">
+    <input type="password" name="password" />
+    <input type="hidden" name="username" th:value="${#authentication.name}" />
+    <button type="submit">Подтвердить</button>
+</form>
+</body>

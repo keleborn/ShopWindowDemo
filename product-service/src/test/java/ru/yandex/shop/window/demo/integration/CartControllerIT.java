@@ -3,15 +3,18 @@ package ru.yandex.shop.window.demo.integration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpCookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
+import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
+import ru.yandex.shop.window.demo.client.ApiClient;
 import ru.yandex.shop.window.demo.client.api.PaymentApi;
 import ru.yandex.shop.window.demo.client.model.PaymentResponse;
 import ru.yandex.shop.window.demo.model.Product;
@@ -22,12 +25,14 @@ import ru.yandex.shop.window.demo.services.CartService;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class CartControllerIT extends AbstractAuthenticatedIT{
+public class CartControllerIT extends AbstractAuthenticatedIT {
     private Product savedProduct;
     private final String username = "test";
 
@@ -76,9 +81,14 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
         PaymentResponse response = new PaymentResponse();
         response.setSuccess(true);
 
+        ApiClient mockApiClient = mock(ApiClient.class);
+        when(paymentApi.getApiClient()).thenReturn(mockApiClient);
         when(paymentApi.processPayment(any())).thenReturn(Mono.just(response));
 
-        authenticatedClient.post().uri("/cart/checkout")
+        authenticatedClient.mutate()
+                .defaultCookie("SESSION", mockAccessToken())
+                .build()
+                .post().uri("/cart/checkout")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("customerName", "John"))
                 .exchange()
@@ -90,7 +100,24 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
     }
 
     @Test
+    void processCheckout_shouldRedirectToOuath2LoginPageIfUserIsNotOauth2Authorized() {
+        PaymentResponse response = new PaymentResponse();
+        response.setSuccess(true);
+
+        when(paymentApi.processPayment(any())).thenReturn(Mono.just(response));
+
+        authenticatedClient.post().uri("/cart/checkout")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .body(BodyInserters.fromFormData("customerName", "John"))
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().valueEquals("Location", "/oauth2/keycloak");
+    }
+
+    @Test
     void processCheckout_shouldReturnErrorPageWhenServerError() {
+        ApiClient mockApiClient = mock(ApiClient.class);
+        when(paymentApi.getApiClient()).thenReturn(mockApiClient);
         when(paymentApi.processPayment(any())).thenReturn(Mono.error(WebClientResponseException.create(
                 HttpStatus.NOT_FOUND.value(),
                 "not found",
@@ -98,7 +125,10 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
                 null,
                 null)));
 
-        authenticatedClient.post().uri("/cart/checkout")
+        authenticatedClient.mutate()
+                .defaultCookie("SESSION", mockAccessToken())
+                .build()
+                .post().uri("/cart/checkout")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .body(BodyInserters.fromFormData("customerName", "test"))
                 .exchange()
@@ -124,6 +154,14 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
     }
 
     @Test
+    void showCart_shouldRedirectToLoginPageIfUserIsNotLoggedIn() {
+        webClient.get().uri("/cart")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().valueEquals("Location", "/login");
+    }
+
+    @Test
     void updateCart_shouldUpdateProductQuantityIsolated() {
         authenticatedClient.post().uri("/cart/update/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -138,7 +176,10 @@ public class CartControllerIT extends AbstractAuthenticatedIT{
 
     @Test
     void checkout_shouldShowOrder() {
-        authenticatedClient.get().uri("/cart/checkout")
+        authenticatedClient.mutate()
+                .defaultCookie("SESSION", mockAccessToken())
+                .build()
+                .get().uri("/cart/checkout")
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(String.class)

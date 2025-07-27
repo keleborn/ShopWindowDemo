@@ -32,8 +32,8 @@ public class OrderControllerIT extends AbstractAuthenticatedIT {
         orderItemRepository.deleteAll().block();
         orderRepository.deleteAll().block();
         order = orderRepository.saveAll(List.of(
-                new Order("test1", LocalDateTime.now()),
-                new Order("test2", LocalDateTime.now())
+                new Order("test", LocalDateTime.now()),
+                new Order("test", LocalDateTime.now())
         )).blockLast();
         orderItemRepository.saveAll(List.of(
                 new OrderItem(order.getId(), "name1", BigDecimal.valueOf(10), 10, null),
@@ -65,5 +65,13 @@ public class OrderControllerIT extends AbstractAuthenticatedIT {
                     assertThat(html).contains("<strong>Дата заказа: </strong>");
                     assertThat(html).contains("name2");
                 });
+    }
+
+    @Test
+    void getOrders_shouldRedirectToLoginPageIfUserIsNotLoggedIn() {
+        webClient.get().uri("/orders")
+                .exchange()
+                .expectStatus().is3xxRedirection()
+                .expectHeader().valueEquals("Location", "/login");
     }
 }

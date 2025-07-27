@@ -9,13 +9,10 @@ import java.io.IOException;
 @TestConfiguration
 public class EmbeddedRedisConfiguration {
 
-    /**
-     * Создаём в контексте бин RedisServer
-     */
-    @Bean(destroyMethod = "stop") // Останавливаем сервер при закрытии контекста
+    @Bean(destroyMethod = "stop")
     public RedisServer redisServer() throws IOException {
         var redisServer = new RedisServer();
-        redisServer.start(); // Запускаем прямо во время инициализации бина
+        redisServer.start();
         return redisServer;
     }
 

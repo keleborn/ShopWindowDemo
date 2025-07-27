@@ -10,6 +10,8 @@ import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 import ru.yandex.shop.window.demo.services.OrderService;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/orders")
 public class OrderController {
@@ -20,8 +22,9 @@ public class OrderController {
     }
 
     @GetMapping
-    public Mono<String> getOrders(Model model) {
-        return orderService.findAllWithItems()
+    public Mono<String> getOrders(Model model, Principal principal) {
+
+        return orderService.findAllWithItems(principal.getName())
                 .doOnNext(orderDtos -> model.addAttribute("orders", orderDtos))
                 .thenReturn("orders");
     }

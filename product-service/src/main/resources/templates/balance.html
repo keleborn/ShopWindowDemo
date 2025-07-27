@@ -12,6 +12,11 @@
     <a th:href="@{/orders}">Заказы</a>
 </div>
 <div style="text-align: right;">
+    <div th:if="${authenticated and !isKeycloakAuthorized}">
+        <form action="/oauth2/keycloak" method="get">
+            <button type="submit">OAuth2 авторизация</button>
+        </form>
+    </div>
     <div th:if="${authenticated}">
         <form th:action="@{/logout}" method="post">
             <button type="submit">Выйти</button>
@@ -20,15 +25,13 @@
 </div>
 
 <form th:action="@{/balance}" method="post">
-    <input type="text" name="username" placeholder="Введите имя..." required/>
+    <input type="hidden" name="username" th:value="${#authentication.name}" />
     <button type="submit">Проверить баланс</button>
 </form>
 
 <div th:if="${balance != null}">
     <p>Текущий баланс: <b th:text="${balance}">0.00</b></p>
 </div>
-
-<p>Такой пользователь не найден</p>
 <hr>
 <a th:href="@{/products}">Назад к витрине</a>
 </body>

@@ -24,7 +24,6 @@ public class PaymentProcessingService {
         return accountRepository.findByUserName(paymentRequest.getUserName())
                 .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND, "Пользователь не найден")))
                 .flatMap(account -> {
-                    System.out.println("Balance: " + account.getUserName() + " " + account.getBalance());
                     BigDecimal subtractedBalance = account.getBalance().subtract(paymentRequest.getAmount());
                     if (subtractedBalance.compareTo(BigDecimal.ZERO) < 0) {
                         return Mono.error(new ResponseStatusException(HttpStatus.BAD_REQUEST, "Недостаточно средств"));
