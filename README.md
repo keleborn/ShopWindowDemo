@@ -34,3 +34,10 @@
 * **Client Authentication** = on
 * **Authorization** = off
 * **Authentication flow** = Direct access grants
+
+#### payment-service-client:
+
+* **Root Url** = http://localhost:8081
+* **Client Authentication** = on
+* **Authorization** = off
+* **Authentication flow** = Direct access grants, Service accounts roles
