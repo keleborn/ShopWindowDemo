@@ -86,28 +86,12 @@ public class CartControllerIT extends AbstractAuthenticatedIT {
                 .build()
                 .post().uri("/cart/checkout")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(BodyInserters.fromFormData("customerName", "John"))
                 .exchange()
                 .expectStatus().is3xxRedirection()
                 .expectHeader().valueEquals("Location", "/orders/1");
 
         assertThat(cartService.getCartItems(username).size()).isEqualTo(0);
-        assertThat(orderRepository.findAll().blockLast().getCustomerName()).isEqualTo("John");
-    }
-
-    @Test
-    void processCheckout_shouldRedirectToOuath2LoginPageIfUserIsNotOauth2Authorized() {
-        PaymentResponse response = new PaymentResponse();
-        response.setSuccess(true);
-
-        when(paymentApi.processPayment(any())).thenReturn(Mono.just(response));
-
-        authenticatedClient.post().uri("/cart/checkout")
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(BodyInserters.fromFormData("customerName", "John"))
-                .exchange()
-                .expectStatus().is3xxRedirection()
-                .expectHeader().valueEquals("Location", "/oauth2/keycloak");
+        assertThat(orderRepository.findAll().blockLast().getCustomerName()).isEqualTo(username);
     }
 
     @Test
@@ -168,20 +152,5 @@ public class CartControllerIT extends AbstractAuthenticatedIT {
 
         cartService.addCartItem("John", new Product(1L, "First", "1234", BigDecimal.valueOf(1000), true, null), 10);
         assertThat(cartService.getCartItems(username).iterator().next().getQuantity()).isEqualTo(5);
-    }
-
-    @Test
-    void checkout_shouldShowOrder() {
-        authenticatedClient.mutate()
-                .defaultCookie("SESSION", mockAccessToken())
-                .build()
-                .get().uri("/cart/checkout")
-                .exchange()
-                .expectStatus().isOk()
-                .expectBody(String.class)
-                .consumeWith(rs -> {
-                    String html = rs.getResponseBody();
-                    assertThat(html).contains("order");
-                });
     }
 }

@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import ru.yandex.shop.window.demo.model.UserForm;
 import ru.yandex.shop.window.demo.services.PaymentService;
@@ -28,27 +27,20 @@ public class BalanceController {
     }
 
     @PostMapping
-    public Mono<String> getBalance(@ModelAttribute UserForm userForm, Model model, ServerWebExchange exchange) {
-        return exchange.getSession()
-                .flatMap(session -> {
-                    String token = (String) session.getAttributes().get("access_token");
-                    if (token == null) {
-                        return Mono.error(new IllegalStateException("Пользователь не авторизован в Keycloak"));
+    public Mono<String> getBalance(@ModelAttribute UserForm userForm, Model model) {
+        return paymentService.getBalance(userForm.getUsername())
+                .map(balance -> {
+                    model.addAttribute("balance", balance);
+                    return "balance";
+                })
+                .onErrorResume(WebClientResponseException.class, ex -> {
+                    if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
+                        return Mono.just("redirect:/balance/404");
                     }
-                    return paymentService.getBalance(token, userForm.getUsername())
-                            .map(balance -> {
-                                model.addAttribute("balance", balance);
-                                return "balance";
-                            })
-                            .onErrorResume(WebClientResponseException.class, ex -> {
-                                if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
-                                    return Mono.just("redirect:/balance/404");
-                                }
-                                if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
-                                    return Mono.just("redirect:/balance/400");
-                                }
-                                return Mono.just("redirect:/balance/payment-error");
-                            });
+                    if (ex.getStatusCode() == HttpStatus.BAD_REQUEST) {
+                        return Mono.just("redirect:/balance/400");
+                    }
+                    return Mono.just("redirect:/balance/payment-error");
                 });
     }
 
