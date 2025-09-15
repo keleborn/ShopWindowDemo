@@ -47,9 +47,7 @@ public class SecurityConfiguration {
 
     private static Mono<Void> onLogoutSuccess(WebFilterExchange exchange, Authentication authentication) {
         return exchange.getExchange().getSession()
-                .doOnNext(session -> {
-                    session.getAttributes().remove("access_token");
-                })
+                .doOnNext(session -> session.getAttributes().remove("access_token"))
                 .then(createRedirectToProductsResponse(exchange, authentication));
     }
 }

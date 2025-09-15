@@ -19,11 +19,6 @@
     <div th:unless="${authenticated}">
         <a th:href="@{/login}">Войти</a>
     </div>
-    <div th:if="${authenticated and !isKeycloakAuthorized}">
-        <form action="/oauth2/keycloak" method="get">
-            <button type="submit">OAuth2 авторизация</button>
-        </form>
-    </div>
     <div th:if="${authenticated}">
         <form th:action="@{/logout}" method="post">
             <button type="submit">Выйти</button>

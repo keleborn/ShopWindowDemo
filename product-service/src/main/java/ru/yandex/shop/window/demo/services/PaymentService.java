@@ -15,20 +15,16 @@ import java.math.BigDecimal;
 public class PaymentService {
     private final PaymentApi paymentApi;
 
-    public Mono<Boolean> processPayment(String userToken, String userName, BigDecimal amount) {
+    public Mono<Boolean> processPayment(String userName, BigDecimal amount) {
         PaymentRequest paymentRequest = new PaymentRequest();
         paymentRequest.setAmount(amount);
         paymentRequest.setUserName(userName);
-
-        paymentApi.getApiClient().setBearerToken(userToken);
 
         return paymentApi.processPayment(paymentRequest)
                 .map(PaymentResponse::getSuccess);
     }
 
-    public Mono<BigDecimal> getBalance(String token, String user) {
-        paymentApi.getApiClient().setBearerToken(token);
-
+    public Mono<BigDecimal> getBalance(String user) {
         return paymentApi.getBalance(user)
                 .map(BalanceResponse::getBalance);
     }
