@@ -10,8 +10,10 @@ import org.springframework.security.oauth2.client.ReactiveOAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 import ru.yandex.shop.window.demo.client.ApiClient;
 import ru.yandex.shop.window.demo.client.api.PaymentApi;
+import ru.yandex.shop.window.demo.excpetptions.InterserviceAuthException;
 
 @Configuration
 public class PaymentClientConfiguration {
@@ -23,6 +25,13 @@ public class PaymentClientConfiguration {
         oauth2.setDefaultClientRegistrationId("payment-service-client");
         return builder
                 .filter(oauth2)
+                .filter((request, next) -> next.exchange(request)
+                        .flatMap(response -> {
+                            if (response.statusCode().value() == 401 || response.statusCode().value() == 403) {
+                                return Mono.error(new InterserviceAuthException("Неудачная авторизация между сервисами."));
+                            }
+                            return Mono.just(response);
+                        }))
                 .build();
     }
 

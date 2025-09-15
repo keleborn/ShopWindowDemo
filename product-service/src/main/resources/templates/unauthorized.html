@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Не авторизован</title>
+</head>
+<body>
+<div style="text-align: right;">
+    <a th:href="@{/cart}">Корзина</a>
+</div>
+<div style="text-align: right;">
+    <a th:href="@{/orders}">Заказы</a>
+</div>
+<div style="text-align: right;">
+    <a th:href="@{/balance}">Проверить баланс</a>
+</div>
+
+<p>Нема авторизации между сервисами</p>
+</body>

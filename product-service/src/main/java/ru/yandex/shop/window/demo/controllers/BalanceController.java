@@ -1,6 +1,7 @@
 package ru.yandex.shop.window.demo.controllers;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import reactor.core.publisher.Mono;
+import ru.yandex.shop.window.demo.excpetptions.InterserviceAuthException;
 import ru.yandex.shop.window.demo.model.UserForm;
 import ru.yandex.shop.window.demo.services.PaymentService;
 
@@ -26,12 +28,16 @@ public class BalanceController {
         return "balance";
     }
 
+    @PreAuthorize("hasRole('ADMIN') or (#userForm.username != null and #userForm.username == authentication.name)")
     @PostMapping
     public Mono<String> getBalance(@ModelAttribute UserForm userForm, Model model) {
         return paymentService.getBalance(userForm.getUsername())
                 .map(balance -> {
                     model.addAttribute("balance", balance);
                     return "balance";
+                })
+                .onErrorResume(InterserviceAuthException.class, e -> {
+                    return Mono.just("redirect:/balance/unauthorized");
                 })
                 .onErrorResume(WebClientResponseException.class, ex -> {
                     if (ex.getStatusCode() == HttpStatus.NOT_FOUND) {
